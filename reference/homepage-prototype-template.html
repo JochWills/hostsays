@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HostSays — Things to do, recommended by local hosts</title>
+<meta name="description" content="Discover and book tours, safaris and ocean experiences on the Eastern Cape coast, recommended by the hosts you stay with.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EF; --surface:#FFFFFF; --panel:#EFECE5; --ink:#1E2723; --muted:#6A706B; --line:#E4E0D8;
+  --green:#2D4A3E; --green-ink:#FFFFFF; --gold:#E3A33B; --pill:rgba(20,26,22,.62);
+  --shadow:0 1px 2px rgba(30,39,35,.06),0 6px 18px rgba(30,39,35,.07);
+  --sans:"Manrope","Segoe UI",system-ui,-apple-system,sans-serif;
+  --serif:"Playfair Display",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --surface:#1B211E; --panel:#20272350; --ink:#E9ECE9; --muted:#A1A9A3; --line:#2C3531;
+    --green:#5E9A82; --green-ink:#0C1511; --pill:rgba(10,14,12,.7);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --surface:#1B211E; --panel:#20272350; --ink:#E9ECE9; --muted:#A1A9A3; --line:#2C3531;
+  --green:#5E9A82; --green-ink:#0C1511; --pill:rgba(10,14,12,.7);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.35);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:8px}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1536px;margin:0 auto;padding:0 clamp(18px,5.8vw,90px)}
+.hero .wrap{padding:0 clamp(18px,8.5vw,130px)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;color:#fff;background:#2c1f11 url("__HERO__") right center / auto 100% no-repeat;min-height:470px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#2c1f11 0%,rgba(44,31,17,.85) 32%,rgba(44,31,17,.45) 50%,rgba(44,31,17,.1) 66%,rgba(0,0,0,0) 80%),linear-gradient(180deg,rgba(0,0,0,.28) 0%,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 70%,rgba(0,0,0,.28) 100%)}
+.hero > *{position:relative}
+.nav{display:flex;align-items:center;gap:28px;padding:22px 0 0}
+.logo{display:flex;align-items:flex-end;font-weight:800;font-size:34px;letter-spacing:-.03em;line-height:1;color:#fff;position:relative}
+.logo .says{position:relative}
+.logo .says svg{position:absolute;left:4px;top:-12px;width:46px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.nav .links{display:flex;gap:30px;margin-left:44px;font-weight:500;font-size:14.5px}
+.nav .links a{opacity:.95}
+.nav .links a:hover{opacity:1;text-decoration:underline;text-underline-offset:6px}
+.nav .right{margin-left:auto;display:flex;align-items:center;gap:26px;font-weight:500;font-size:14.5px}
+.iconbtn{background:none;border:0;padding:6px;cursor:pointer;color:inherit;display:grid;place-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;background:var(--green);color:var(--green-ink);font-weight:600;border-radius:14px;padding:13px 26px;font-size:14.5px;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.nav .btn{background:#2D4A3E;color:#fff;border:1px solid rgba(255,255,255,.08)}
+.staying{display:none;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);padding:6px 12px;border-radius:999px;font-size:13px}
+.staying.on{display:inline-flex}
+.staying b{font-weight:700}
+.staying button{background:none;border:0;color:#fff;opacity:.8;cursor:pointer;padding:0 0 0 4px;font-size:15px;line-height:1}
+.menu{display:none}
+
+.hero-copy{padding:62px 0 0;max-width:720px}
+.hero h1{margin:0;font-weight:800;font-size:clamp(34px,4.6vw,56px);line-height:1.05;letter-spacing:-.025em;text-shadow:0 2px 20px rgba(0,0,0,.25)}
+.hero h1 em{font-family:var(--serif);font-style:italic;font-weight:600;letter-spacing:-.01em}
+.hero p.lead{margin:18px 0 0;font-size:clamp(15px,1.35vw,18.5px);line-height:1.45;max-width:560px;opacity:.96}
+
+.search{margin-top:40px;display:grid;grid-template-columns:1.1fr 1.2fr .8fr auto;align-items:center;background:#fff;color:#1E2723;border-radius:14px;padding:6px;max-width:905px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.search label{display:flex;align-items:center;gap:12px;padding:12px 18px;border-right:1px solid #E6E2DA;cursor:text;min-width:0}
+.search label:nth-child(3){border-right:0}
+.search input{border:0;outline:0;background:none;width:100%;font-size:14.5px;min-width:0;color:#1E2723}
+.search input::placeholder{color:#5f6660}
+.search .i{color:#3c4540}
+.search .btn{padding:14px 44px;border-radius:10px;background:#2D4A3E;color:#fff}
+
+.cats{display:flex;gap:18px;flex-wrap:wrap;margin:22px 0 0;padding:0 0 32px}
+.cat{display:flex;align-items:center;gap:10px;background:none;border:0;color:#fff;cursor:pointer;font-size:12.5px;font-weight:500;padding:0}
+.cat span.ring{width:38px;height:38px;border-radius:50%;border:1.4px solid rgba(255,255,255,.75);display:grid;place-items:center;background:rgba(255,255,255,.06);transition:.2s}
+.cat[aria-pressed="true"] span.ring,.cat:hover span.ring{background:#fff;color:#2D4A3E}
+
+/* ---------- main ---------- */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 385px;gap:22px;padding-top:26px;position:relative}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;margin:4px 0 12px}
+.sechead h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.viewall{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500}
+.viewall{white-space:nowrap}
+@media (max-width:620px){.sechead h2{font-size:18px}}
+.viewall .i{width:16px;height:16px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.card{background:var(--surface);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .2s}
+.card:hover{transform:translateY(-2px)}
+.card .ph{position:relative;aspect-ratio:220/143;background:#cfc6b6 center/cover}
+.card .loc{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:5px;background:var(--pill);color:#fff;font-size:11px;font-weight:500;padding:3px 9px 3px 6px;border-radius:999px;backdrop-filter:blur(4px)}
+.gh .card .loc{top:10px;bottom:auto}
+.card .loc .i{width:12px;height:12px;fill:#fff;stroke:none}
+.heart{position:absolute;right:10px;top:10px;background:none;border:0;padding:2px;cursor:pointer;color:#fff;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.heart .i{width:24px;height:24px;stroke-width:1.7}
+.heart[aria-pressed="true"] .i{fill:#fff}
+.card .body{padding:12px 13px 14px;display:flex;flex-direction:column;gap:2px;flex:1}
+.card h3{margin:0;font-size:14.5px;font-weight:700;letter-spacing:-.005em}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+.hosts{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12px;font-weight:600;color:var(--green)}
+.hosts .dots{display:flex}
+.hosts .dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--surface);margin-left:-5px;display:block}
+.hosts .dots i:first-child{margin-left:0}
+.rate{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12.5px;color:var(--muted)}
+.stars{display:flex;gap:2px;color:var(--gold)}
+.stars .i{width:13px;height:13px;fill:currentColor;stroke:none}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.price{color:var(--ink);font-weight:700;font-size:13px;white-space:nowrap}
+.price small{font-weight:500;color:var(--muted);font-size:11.5px}
+.gh .card .body{padding:14px 13px 16px}
+.gh .card h3{font-size:15px}
+.gh .meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12.5px;color:var(--muted)}
+.gh .meta a{color:var(--green);font-weight:600}
+
+/* side panels */
+.side{display:flex;flex-direction:column;gap:22px;position:relative}
+.coastbg{position:absolute;top:0;bottom:-40px;right:calc(-1 * clamp(18px,5.8vw,90px));width:170px;background:url("__COAST__") center/cover;opacity:.95;border-radius:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 45%);mask-image:linear-gradient(90deg,transparent,#000 45%);pointer-events:none}
+.promo{position:relative;background:var(--panel);border-radius:14px;padding:26px 22px 26px;overflow:visible;min-height:250px}
+:root:not([data-theme="dark"]) .promo{background:rgba(236,232,224,.92)}
+.promo small{font-size:11.5px;color:var(--muted);font-weight:500}
+.promo h3{margin:6px 0 12px;font-size:20px;line-height:1.2;font-weight:700;letter-spacing:-.015em;max-width:220px}
+.promo p{margin:0 0 22px;color:var(--muted);font-size:13.5px;line-height:1.45;max-width:210px}
+.promo .btn{border-radius:14px;padding:11px 22px;font-size:14px}
+.promo .btn .i{width:16px;height:16px}
+.phone{position:absolute;right:-26px;top:22px;width:172px;background:#fff;border-radius:10px;padding:6px 6px 12px;box-shadow:0 12px 30px rgba(0,0,0,.18);transform:rotate(3deg);color:#1E2723}
+.phone .top{height:92px;border-radius:6px;background:center/cover}
+.phone .t{font-size:10.5px;color:#5b615c;margin:10px 4px 8px;line-height:1.3}
+.phone .row{display:flex;gap:5px;padding:0 3px}
+.phone .row i{flex:1;height:58px;border-radius:5px;background:center/cover;display:block}
+.promo.ops{min-height:210px}
+.promo.ops p{max-width:250px}
+
+/* how it works */
+.how{margin:36px 0 0;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:28px clamp(18px,3vw,36px);display:grid;grid-template-columns:260px repeat(4,1fr);gap:24px;align-items:start}
+.how h2{margin:0;font-size:20px;font-weight:700}
+.how h2 + p{margin:6px 0 0;color:var(--muted);font-size:13.5px}
+.step b{display:flex;align-items:center;gap:10px;font-size:14.5px}
+.step b span{width:28px;height:28px;border-radius:50%;background:var(--green);color:var(--green-ink);display:grid;place-items:center;font-size:13px}
+.step p{margin:8px 0 0;color:var(--muted);font-size:13px}
+
+footer{margin-top:56px;border-top:1px solid var(--line);padding:30px 0 40px;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:18px 40px;justify-content:space-between}
+footer .flogo{font-weight:800;font-size:20px;color:var(--ink);letter-spacing:-.02em}
+footer nav{display:flex;gap:22px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(16px);opacity:0;background:#1E2723;color:#fff;padding:11px 16px;border-radius:10px;font-size:14px;transition:.25s;pointer-events:none;z-index:40}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  .nav .links{gap:20px;margin-left:24px}
+  .main{grid-template-columns:1fr}
+  .side{flex-direction:row}
+  .side .promo{flex:1}
+  .coastbg{display:none}
+  .phone{right:16px}
+  .how{grid-template-columns:1fr 1fr}
+  .how > div:first-child{grid-column:1/-1}
+}
+@media (max-width:980px){
+  .nav .links,.nav .right .signin{display:none}
+  .menu{display:grid}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .search{grid-template-columns:1fr 1fr}
+  .search label{border-right:0;border-bottom:1px solid #E6E2DA}
+  .search label:nth-child(3){grid-column:1/2;border-bottom:0}
+  .search .btn{justify-content:center}
+  .side{flex-direction:column}
+  .hero{background-position:70% 30%}
+}
+@media (max-width:620px){
+  .logo{font-size:28px}
+  .nav{gap:14px}
+  .nav .right{gap:10px}
+  .nav .right .btn{display:none}
+  .hero-copy{padding-top:40px}
+  .search{grid-template-columns:1fr}
+  .search label{border-bottom:1px solid #E6E2DA}
+  .search label:nth-child(3){grid-column:auto}
+  .cats{flex-wrap:nowrap;overflow-x:auto;padding-bottom:26px;margin-right:calc(-1 * clamp(18px,5.8vw,90px));scrollbar-width:none}
+  .cat{flex:none}
+  .cards{grid-template-columns:1fr 1fr;gap:10px}
+  .card .body{padding:10px 10px 12px}
+  .foot{flex-wrap:wrap}
+  .rate{flex-wrap:wrap}
+  .phone{display:none}
+  .promo h3,.promo p{max-width:none}
+  .how{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.card,.cat span.ring{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6" fill="#555" stroke="none"/></symbol>
+  <symbol id="pinline" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 1 1 13 0c0 5.2-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20.5S3.5 15.3 3.5 9.2A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 2.6c0 6.1-8.5 11.3-8.5 11.3z"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+  <symbol id="binoc" viewBox="0 0 24 24"><circle cx="6.5" cy="15.5" r="3.5"/><circle cx="17.5" cy="15.5" r="3.5"/><path d="M10 15.5h4M4 13l2-7h3l1 5M20 13l-2-7h-3l-1 5"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M8 13.5h2M12 13.5h2M8 16.5h2"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol>
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="c-safari" viewBox="0 0 24 24"><path d="M3.5 15.5V11l2-3.5h10L18 11h2.5v4.5M3.5 15.5h17M7 7.5V5M13 7.5V5"/><circle cx="7.5" cy="16.5" r="2"/><circle cx="16.5" cy="16.5" r="2"/><path d="M9 11h5"/></symbol>
+  <symbol id="c-ocean" viewBox="0 0 24 24"><path d="M3 17c1.8 0 1.8-1.4 3.6-1.4S8.4 17 10.2 17s1.8-1.4 3.6-1.4 1.8 1.4 3.6 1.4 1.8-1.4 3.6-1.4"/><path d="M5 13.5c0-4 3-7 7-7 2.4 0 4 1.3 4.5 3-1.8-.6-3.8.2-4.4 2.1-.4 1.3-.1 2.4.6 3.1"/></symbol>
+  <symbol id="c-adv" viewBox="0 0 24 24"><path d="M3 19l6.5-11 4 6.5 2.5-4 5 8.5z"/><path d="M8 10.5l1.5 1.5 1.5-1.5"/></symbol>
+  <symbol id="c-food" viewBox="0 0 24 24"><path d="M8 3.5h8l-.6 5.2a3.4 3.4 0 0 1-6.8 0zM12 12v8M8.5 20.5h7"/></symbol>
+  <symbol id="c-culture" viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"/><circle cx="16" cy="8" r="2.5"/><circle cx="12" cy="10.5" r="2.2"/><path d="M3.5 17c0-2.6 2-4.3 4.5-4.3M20.5 17c0-2.6-2-4.3-4.5-4.3M7.5 19c0-2.6 2-4.4 4.5-4.4s4.5 1.8 4.5 4.4"/></symbol>
+  <symbol id="c-well" viewBox="0 0 24 24"><path d="M12 19c-4 0-7.5-2.5-8.5-6.5 3 .1 5.6 1.3 7 3.3M12 19c4 0 7.5-2.5 8.5-6.5-3 .1-5.6 1.3-7 3.3M12 19c-2-1.8-3-4-3-6.5S10 7.8 12 5c2 2.8 3 5 3 7.5S14 17.2 12 19z"/></symbol>
+</svg>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="nav">
+      <a class="logo" href="#top" aria-label="HostSays home">Host<span class="says"><svg viewBox="0 0 46 16" aria-hidden="true"><path d="M2 14l10-9 6 5 8-8 18 12"/></svg>Says</span></a>
+      <nav class="links" aria-label="Main">
+        <a href="#experiences">Experiences</a>
+        <a href="#hosts">Hosts</a>
+        <a href="#areas">Areas</a>
+        <a href="#how">How it works</a>
+        <a href="#for-hosts">For Hosts</a>
+      </nav>
+      <div class="right">
+        <span class="staying" id="staying" aria-live="polite">Staying at <b id="stayname"></b><button id="clearstay" aria-label="Clear accommodation">×</button></span>
+        <button class="iconbtn" aria-label="Search" onclick="document.getElementById('q-where').focus()"><svg class="i" style="width:20px;height:20px"><use href="#search"/></svg></button>
+        <a class="signin" href="#" onclick="toast('Host and operator sign-in is coming soon');return false">Sign in</a>
+        <a class="btn" href="#for-operators">List your experience</a>
+        <button class="iconbtn menu" aria-label="Menu" onclick="toast('Menu: Experiences, Hosts, Areas, How it works')"><svg class="i" style="width:24px;height:24px"><use href="#menu"/></svg></button>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <h1>Things to do,<br><em>recommended by local hosts.</em></h1>
+      <p class="lead">Book the best safaris, ocean trips and local adventures on the Eastern Cape coast, picked by the guesthouses and hosts you stay with.</p>
+    </div>
+
+    <form class="search" id="search" role="search">
+      <label><svg class="i"><use href="#pinline"/></svg><input id="q-where" list="areas-list" placeholder="Where are you going?" aria-label="Area"></label>
+      <label><svg class="i"><use href="#binoc"/></svg><input id="q-what" placeholder="What would you like to do?" aria-label="Activity"></label>
+      <label><svg class="i"><use href="#cal"/></svg><input id="q-when" placeholder="Any date" aria-label="Date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'"></label>
+      <button class="btn" type="submit"><svg class="i"><use href="#search"/></svg>Search</button>
+      <datalist id="areas-list"><option>Gqeberha</option><option>Addo</option><option>Jeffreys Bay</option><option>St Francis Bay</option><option>Kenton-on-Sea</option><option>Port Alfred</option></datalist>
+    </form>
+
+    <div class="cats" role="group" aria-label="Categories">
+      <button class="cat" data-cat="safari" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-safari"/></svg></span>Safaris &amp; Wildlife</button>
+      <button class="cat" data-cat="ocean" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-ocean"/></svg></span>Ocean &amp; Marine</button>
+      <button class="cat" data-cat="adventure" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-adv"/></svg></span>Adventure &amp; Outdoors</button>
+      <button class="cat" data-cat="food" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-food"/></svg></span>Food &amp; Drink</button>
+      <button class="cat" data-cat="culture" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-culture"/></svg></span>Culture &amp; Heritage</button>
+      <button class="cat" data-cat="wellness" aria-pressed="false"><span class="ring"><svg class="i"><use href="#c-well"/></svg></span>Wellness &amp; Slow Days</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="main">
+    <div>
+      <section id="experiences" aria-labelledby="h-exp">
+        <div class="sechead"><h2 id="h-exp">Most recommended by hosts</h2><a class="viewall" href="#experiences" id="viewall">View all <svg class="i"><use href="#arrow"/></svg></a></div>
+        <div class="cards" id="expcards"></div>
+      </section>
+      <section id="hosts" class="gh" aria-labelledby="h-hosts">
+        <div class="sechead"><h2 id="h-hosts">Hosts who know the area</h2><a class="viewall" href="#hosts">View all <svg class="i"><use href="#arrow"/></svg></a></div>
+        <div class="cards" id="hostcards"></div>
+      </section>
+    </div>
+
+    <aside class="side">
+      <div class="coastbg" aria-hidden="true"></div>
+      <section class="promo" id="for-hosts">
+        <small>For guesthouses, B&amp;Bs and hotels</small>
+        <h3>Your guests ask what to do. Earn when they book.</h3>
+        <p>Get a free HostSays page with your recommended experiences, and earn 6% on every booking your guests make.</p>
+        <a class="btn" href="#" onclick="toast('Host sign-up opens soon');return false">Join as a host <svg class="i"><use href="#arrow"/></svg></a>
+        <div class="phone" aria-hidden="true">
+          <div class="top" style="background-image:url('__ROOM__')"></div>
+          <div class="t">hostsays.com/onthebay<br><b style="color:#1E2723">Our picks near you</b></div>
+          <div class="row"><i style="background-image:url('__MINI1__')"></i><i style="background-image:url('__MINI2__')"></i><i style="background-image:url('__SEAL__')"></i></div>
+        </div>
+      </section>
+      <section class="promo ops" id="for-operators">
+        <small>For tourism operators</small>
+        <h3>Reach travellers through trusted local stays.</h3>
+        <p>List your experience for free. No monthly fees: you only pay 10% on completed bookings, and we collect it for you.</p>
+        <a class="btn" href="#" onclick="toast('Operator listings open soon');return false">List your experience <svg class="i"><use href="#arrow"/></svg></a>
+      </section>
+    </aside>
+  </div>
+
+  <section class="how" id="how" aria-labelledby="h-how">
+    <div><h2 id="h-how">How booking works</h2><p>No payment until your booking is confirmed.</p></div>
+    <div class="step"><b><span>1</span>Request</b><p>Pick a date and group size and send a request. It's free.</p></div>
+    <div class="step"><b><span>2</span>Operator confirms</b><p>The operator confirms within 12 hours, and we email you.</p></div>
+    <div class="step"><b><span>3</span>Pay 10% deposit</b><p>Secure your spot online. It counts toward the total price.</p></div>
+    <div class="step"><b><span>4</span>Go</b><p>Pay the balance to the operator on the day and enjoy it.</p></div>
+  </section>
+  <p id="areas" style="margin:18px 2px 0;color:var(--muted);font-size:13px">Now live along the Eastern Cape coast: Gqeberha, Addo, Jeffreys Bay, St Francis Bay, Kenton-on-Sea and Port Alfred. Hosts earn a commission when you book through them.</p>
+</main>
+
+<footer><div class="wrap">
+  <div><div class="flogo">HostSays</div><div style="margin-top:6px">Things to do, recommended by local hosts.</div></div>
+  <nav aria-label="Footer"><a href="#how">How it works</a><a href="#for-hosts">For hosts</a><a href="#for-operators">For operators</a><a href="#">Help</a><a href="#">Terms</a><a href="#">Privacy</a></nav>
+  <div>Prototype. Listings, prices and photos are placeholders.</div>
+</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const EXP=[
+ {t:"Schotia Big Five Safari",d:"Afternoon game drive with lions, elephants and a bush dinner",a:"Addo",cat:"safari",img:"__LION__",r:4.9,n:120,h:14,p:2950},
+ {t:"Pro Dive Seal Snorkel",d:"Float alongside playful Cape fur seals in Algoa Bay",a:"Gqeberha",cat:"ocean",img:"__SEAL__",r:4.8,n:96,h:11,p:1150},
+ {t:"Horseback Bush Trail",d:"Ride through valley bushveld at golden hour",a:"Addo",cat:"adventure",img:"__HORSE__",r:4.9,n:74,h:8,p:850},
+ {t:"Wine & Cheese Sundowner",d:"Tasting on a farm stoep as the sun goes down",a:"Kenton-on-Sea",cat:"food",img:"__WINE__",r:4.8,n:210,h:9,p:495},
+];
+const HOSTS=[
+ {t:"Sundays River Retreat",a:"Addo",img:"__GH1__",picks:9,slug:"sundaysriver"},
+ {t:"Kenton Cliff House",a:"Kenton-on-Sea",img:"__GH2__",picks:7,slug:"kentoncliff"},
+ {t:"On The Bay B&B",a:"Gqeberha",img:"__GH3__",picks:12,slug:"onthebay"},
+ {t:"Aloe Farmstead",a:"Jeffreys Bay",img:"__GH4__",picks:6,slug:"aloefarmstead"},
+];
+const DOTS=["#C98B4B","#6E8B74","#3F6E8C","#B8604A","#8A7A5C"];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const R=n=>"R"+n.toLocaleString("en-ZA");
+function stars(r){let s="";for(let i=1;i<=5;i++){s+=`<svg class="i" style="${i>Math.round(r*2)/2+0.01?'opacity:.3':''}"><use href="#star"/></svg>`}return s}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2400)}
+let filter={cat:null,where:"",what:""};
+function renderExp(){
+  const list=EXP.filter(e=>(!filter.cat||e.cat===filter.cat)&&(!filter.where||e.a.toLowerCase().includes(filter.where))&&(!filter.what||(e.t+" "+e.d).toLowerCase().includes(filter.what)));
+  const el=document.getElementById("expcards");
+  if(!list.length){el.innerHTML=`<p style="grid-column:1/-1;color:var(--muted);padding:20px 0">No experiences match that yet. <a href="#" style="color:var(--green);font-weight:600" onclick="resetFilters();return false">Show all</a></p>`;return}
+  el.innerHTML=list.map(e=>`<article class="card">
+    <div class="ph" style="background-image:url('${e.img}')" role="img" aria-label="${esc(e.t)}">
+      <span class="loc"><svg class="i"><use href="#pin"/></svg>${esc(e.a)}</span>
+      <button class="heart" aria-pressed="false" aria-label="Save ${esc(e.t)}"><svg class="i"><use href="#heart"/></svg></button>
+    </div>
+    <div class="body">
+      <h3>${esc(e.t)}</h3><p>${esc(e.d)}</p>
+      <div class="rate"><span class="stars">${stars(e.r)}</span>${e.r} (${e.n})</div>
+      <div class="foot"><span class="hosts" title="Recommended by ${e.h} local hosts"><span class="dots">${DOTS.slice(0,3).map(c=>`<i style="background:${c}"></i>`).join("")}</span>${e.h} hosts</span><span class="price">${R(e.p)} <small>pp</small></span></div>
+    </div></article>`).join("");
+  bindHearts();
+}
+function renderHosts(){
+  document.getElementById("hostcards").innerHTML=HOSTS.map(h=>`<article class="card">
+    <div class="ph" style="background-image:url('${h.img}')" role="img" aria-label="${esc(h.t)}">
+      <span class="loc"><svg class="i"><use href="#pin"/></svg>${esc(h.a)}</span>
+      <button class="heart" aria-pressed="false" aria-label="Save ${esc(h.t)}"><svg class="i"><use href="#heart"/></svg></button>
+    </div>
+    <div class="body"><h3>${esc(h.t)}</h3>
+      <div class="meta"><span>${h.picks} picks</span><a href="?ref=${h.slug}" onclick="setStay('${h.slug}');return false">Their picks →</a></div>
+    </div></article>`).join("");
+  bindHearts();
+}
+function bindHearts(){document.querySelectorAll(".heart").forEach(b=>b.onclick=()=>{const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);toast(on?"Saved to your list":"Removed from your list")})}
+function resetFilters(){filter={cat:null,where:"",what:""};document.querySelectorAll(".cat").forEach(c=>c.setAttribute("aria-pressed","false"));document.getElementById("q-where").value="";document.getElementById("q-what").value="";renderExp()}
+document.querySelectorAll(".cat").forEach(c=>c.onclick=()=>{const on=c.getAttribute("aria-pressed")!=="true";document.querySelectorAll(".cat").forEach(x=>x.setAttribute("aria-pressed","false"));c.setAttribute("aria-pressed",on);filter.cat=on?c.dataset.cat:null;renderExp();document.getElementById("experiences").scrollIntoView({behavior:"smooth"})});
+document.getElementById("search").onsubmit=ev=>{ev.preventDefault();filter.where=document.getElementById("q-where").value.trim().toLowerCase();filter.what=document.getElementById("q-what").value.trim().toLowerCase();renderExp();document.getElementById("experiences").scrollIntoView({behavior:"smooth"})};
+document.getElementById("viewall").onclick=ev=>{ev.preventDefault();resetFilters()};
+
+/* host attribution for this browser session */
+function setStay(slug){const h=HOSTS.find(x=>x.slug===slug);if(!h)return;try{sessionStorage.setItem("hs-stay",slug)}catch(e){}showStay();toast(`Staying at ${h.t}. They'll be credited when you book.`)}
+function showStay(){let s=null;try{s=sessionStorage.getItem("hs-stay")}catch(e){}const h=HOSTS.find(x=>x.slug===s);const el=document.getElementById("staying");if(h){document.getElementById("stayname").textContent=h.t;el.classList.add("on")}else el.classList.remove("on")}
+document.getElementById("clearstay").onclick=()=>{try{sessionStorage.removeItem("hs-stay")}catch(e){}showStay()};
+(function(){const q=new URLSearchParams(location.search).get("ref");if(q&&HOSTS.some(h=>h.slug===q)){try{sessionStorage.setItem("hs-stay",q)}catch(e){}}})();
+renderExp();renderHosts();showStay();
+</script>
+</body>
+</html>
