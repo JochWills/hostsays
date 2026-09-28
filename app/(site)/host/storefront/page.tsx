@@ -45,7 +45,7 @@ export default async function HostStorefront() {
           </span>
           <div className="min-w-[240px] flex-1">
             <ActionForm action={uploadHostPhoto} submitLabel="Upload photo" pendingLabel="Uploading…">
-              <FileField name="photo" label={s.photo_path ? "Replace photo" : "Add a photo"} accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB." />
+              <FileField name="photo" label={s.photo_path ? "Replace photo" : "Add a photo"} accept="image/jpeg,image/png,image/webp" hint="At least 800 pixels wide. JPG, PNG or WebP, up to 5 MB." />
             </ActionForm>
           </div>
         </div>

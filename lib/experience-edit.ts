@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { invalid, type FormState } from "@/lib/form-state";
 import type { Category } from "@/lib/categories";
 import { minBookableDate } from "@/lib/dates";
+import { preparePhoto } from "@/lib/photo-upload";
 import { blackoutInput, experienceDetails, slotInput } from "@/lib/validation/portal";
 
 /**
@@ -99,23 +100,20 @@ export async function insertExperience(db: Db, operatorId: string, d: z.infer<ty
 
 // ---------- Photos ----------
 
-const PHOTO_TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const MAX_PHOTOS = 10;
+/** Experience photos fill a wide panel on the listing page, so they must be at least this big to look sharp. */
+export const MIN_EXPERIENCE_PHOTO_EDGE = 1200;
 
 export async function addPhoto(db: Db, exp: { id: string; title: string }, form: FormData): Promise<FormState> {
-  const file = form.get("photo");
-  if (!(file instanceof File) || file.size === 0) return { errors: { photo: "Choose a photo to upload" } };
-  const ext = PHOTO_TYPES[file.type];
-  if (!ext) return { errors: { photo: "Use a JPG, PNG or WebP photo" } };
-  if (file.size > MAX_PHOTO_BYTES) return { errors: { photo: "Photos must be 5 MB or smaller" } };
-  const alt = String(form.get("alt") ?? "").trim().slice(0, 150) || exp.title;
-
   const { data: existing } = await db.from("experience_photos").select("sort_order").eq("experience_id", exp.id);
   if ((existing?.length ?? 0) >= MAX_PHOTOS) return { error: `Up to ${MAX_PHOTOS} photos per experience.` };
 
-  const path = `${exp.id}/${randomUUID()}.${ext}`;
-  const upload = await db.storage.from("experience-photos").upload(path, file, { contentType: file.type, upsert: false });
+  const photo = await preparePhoto(form.get("photo"), MIN_EXPERIENCE_PHOTO_EDGE);
+  if (!photo.ok) return { errors: { photo: photo.error } };
+  const alt = String(form.get("alt") ?? "").trim().slice(0, 150) || exp.title;
+
+  const path = `${exp.id}/${randomUUID()}.${photo.ext}`;
+  const upload = await db.storage.from("experience-photos").upload(path, photo.body, { contentType: photo.contentType, upsert: false });
   if (upload.error) {
     console.error("photo upload failed", upload.error.message);
     return { error: "Couldn't upload the photo. Please try again." };

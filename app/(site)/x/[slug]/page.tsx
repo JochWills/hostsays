@@ -106,6 +106,7 @@ export default async function ExperiencePage({ params }: PageProps<"/x/[slug]">)
                   alt={cover.alt}
                   fill
                   priority
+                  quality={85}
                   sizes="(max-width: 980px) 100vw, 60vw"
                   className="object-cover"
                 />

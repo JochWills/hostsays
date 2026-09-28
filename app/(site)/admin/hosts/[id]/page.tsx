@@ -106,7 +106,7 @@ export default async function AdminHost({ params, searchParams }: PageProps<"/ad
           </span>
           <div className="min-w-[240px] flex-1">
             <ActionForm action={adminUploadHostPhoto.bind(null, h.id)} submitLabel="Upload photo" pendingLabel="Uploading…">
-              <FileField name="photo" label={h.photo_path ? "Replace photo" : "Add a photo"} accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB." />
+              <FileField name="photo" label={h.photo_path ? "Replace photo" : "Add a photo"} accept="image/jpeg,image/png,image/webp" hint="At least 800 pixels wide. JPG, PNG or WebP, up to 5 MB." />
             </ActionForm>
           </div>
         </div>

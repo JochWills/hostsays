@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
     // Photos come from the public Supabase Storage buckets.
     remotePatterns: [new URL(`${supabaseUrl}/storage/v1/object/public/**`)],
     formats: ["image/avif", "image/webp"],
+    // 75 is the default; the big photo on an experience page uses 85 so it stays crisp.
+    qualities: [75, 85],
   },
 };
 

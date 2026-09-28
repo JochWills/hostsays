@@ -91,7 +91,7 @@ export function ExperienceEditor({
         {editable && (
           <ActionForm action={actions.uploadPhoto} submitLabel="Upload photo" pendingLabel="Uploading…">
             <Row>
-              <FileField name="photo" label="Add a photo" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 5 MB." />
+              <FileField name="photo" label="Add a photo" accept="image/jpeg,image/png,image/webp" hint="At least 1200 pixels wide, landscape works best. Use the original from your camera or phone (JPG, PNG or WebP, up to 5 MB)." />
               <TextField name="alt" label="Describe the photo (optional)" hint="Helps people using screen readers, e.g. Elephants at a waterhole" />
             </Row>
           </ActionForm>
