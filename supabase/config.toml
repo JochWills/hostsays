@@ -433,9 +433,29 @@ enable_confirmations = true
 max_frequency = "1m0s"
 otp_length = 8
 
+# Auth emails (confirm sign-up, sign-in links) go through Resend. The key comes from RESEND_API_KEY in
+# .env.local: push with `set -a; source .env.local; set +a; npx supabase config push`.
+[remotes.production.auth.email.smtp]
+enabled = true
+host = "smtp.resend.com"
+port = 465
+user = "resend"
+pass = "env(RESEND_API_KEY)"
+admin_email = "no-reply@hostsays.com"
+sender_name = "HostSays"
+
+# Emails per hour for the whole project (the built-in sender was capped at 2).
+[remotes.production.auth.rate_limit]
+email_sent = 60
+
 [remotes.production.auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
+
+# Match the hosted pooler (set by Supabase for this plan) so config push leaves it alone.
+[remotes.production.db.pooler]
+default_pool_size = 15
+max_client_conn = 200
 
 [remotes.production.storage.analytics]
 enabled = true
