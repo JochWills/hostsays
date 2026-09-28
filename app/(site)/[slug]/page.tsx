@@ -7,6 +7,7 @@ import { ExperienceCard, ExperienceGrid } from "@/components/cards/experience-ca
 import { HostGrid } from "@/components/cards/host-card";
 import { CategoryChips } from "@/components/home/category-chips";
 import { PickFilter } from "@/components/storefront/pick-filter";
+import { StorefrontBeacon } from "@/components/site/storefront-beacon";
 import { SectionHead } from "@/components/ui/section-head";
 import { pageTitle } from "@/components/ui/styles";
 import { CATEGORIES } from "@/lib/categories";
@@ -117,6 +118,7 @@ async function Storefront({ host }: { host: HostCard }) {
 
   return (
     <div className="wrap pt-8">
+      <StorefrontBeacon slug={host.slug} />
       <div className="grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,360px)]">
         <div>
           {host.area && (

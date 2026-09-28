@@ -1,5 +1,8 @@
 import "server-only";
+import type { NextRequest, NextResponse } from "next/server";
 import { createPublicClient } from "@/lib/supabase/public";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { HOST_COOKIE, HOST_NAME_COOKIE, HOST_VIA_COOKIE, SEEN_COOKIE, type Via } from "@/lib/attribution";
 
 type Host = { id: string; slug: string; name: string };
 
@@ -34,4 +37,35 @@ const BOT = /bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram|previe
 
 export function isBot(userAgent: string | null): boolean {
   return !userAgent || BOT.test(userAgent);
+}
+
+
+/**
+ * Sets the session host from the first candidate that is a verified host (last touch wins) and, for a
+ * storefront, counts the visit once per session. Returns the visit write for the caller to run in the
+ * background (proxy: event.waitUntil, route handler: after), or null.
+ */
+export async function applyAttribution(
+  request: NextRequest,
+  response: NextResponse,
+  candidates: [slug: string, via: Via][],
+): Promise<Promise<void> | null> {
+  for (const [slug, via] of candidates) {
+    const host = await findVerifiedHost(slug);
+    if (!host) continue;
+
+    const session = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" };
+    response.cookies.set(HOST_COOKIE, host.slug, session);
+    response.cookies.set(HOST_NAME_COOKIE, host.name, session);
+    response.cookies.set(HOST_VIA_COOKIE, via, session);
+
+    if (via !== "storefront" || isBot(request.headers.get("user-agent"))) return null;
+    const seen = (request.cookies.get(SEEN_COOKIE)?.value ?? "").split(",").filter(Boolean);
+    if (seen.includes(host.slug)) return null;
+    response.cookies.set(SEEN_COOKIE, [...seen, host.slug].slice(-30).join(","), { ...session, httpOnly: true });
+    return Promise.resolve(createAdminClient().rpc("record_storefront_visit", { p_host_id: host.id })).then(({ error }) => {
+      if (error) console.error("record_storefront_visit failed", error.message);
+    });
+  }
+  return null;
 }

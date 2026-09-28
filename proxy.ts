@@ -1,9 +1,8 @@
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { COMING_SOON, PREVIEW_COOKIE, matchesPreviewKey } from "@/lib/preview";
 import { refreshSession } from "@/lib/supabase/proxy";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { HOST_COOKIE, HOST_NAME_COOKIE, HOST_VIA_COOKIE, SEEN_COOKIE, type Via } from "@/lib/attribution";
-import { findVerifiedHost, isBot } from "@/lib/attribution-server";
+import type { Via } from "@/lib/attribution";
+import { applyAttribution } from "@/lib/attribution-server";
 
 // Signed-in areas. Public pages never read the session, so they skip the refresh and stay cacheable.
 const SESSION_PATHS = /^\/(admin|host|operator|account|login|signup|auth)(\/|$)/;
@@ -28,13 +27,16 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 }
 
 /**
- * Remember which host sent this guest (docs/07-host-attribution.md): a verified host's storefront or any
- * page with ?ref=<slug> sets the session host (last touch wins), and a storefront visit is counted once
- * per session. Link prefetches are ignored, so hovering over a host card doesn't change anything.
+ * Remember which host sent this guest (docs/07-host-attribution.md) when a page is actually opened: a
+ * verified host's storefront or any page with ?ref=<slug>. Only real page loads count. Next.js prefetches
+ * (and client-side navigations) are fetches, not documents; on the live server the prefetch header isn't
+ * visible here, so rely on the browser's Sec-Fetch-Dest instead. Client-side visits to a storefront are
+ * recorded by the page itself (StorefrontBeacon → /api/attribution).
  */
 async function attributeHost(request: NextRequest, response: NextResponse, event: NextFetchEvent) {
   if (request.method !== "GET") return;
-  if (request.headers.get("next-router-prefetch") || request.headers.get("purpose") === "prefetch") return;
+  const dest = request.headers.get("sec-fetch-dest");
+  if ((dest && dest !== "document") || request.headers.get("rsc") || request.nextUrl.searchParams.has("_rsc")) return;
 
   const storefrontSlug = request.nextUrl.pathname.match(STOREFRONT_PATH)?.[1];
   const ref = request.nextUrl.searchParams.get("ref")?.toLowerCase();
@@ -43,28 +45,8 @@ async function attributeHost(request: NextRequest, response: NextResponse, event
   if (ref && ref.length <= 40 && SLUG.test(ref)) candidates.push([ref, "ref_link"]);
   if (!candidates.length) return;
 
-  for (const [slug, via] of candidates) {
-    const host = await findVerifiedHost(slug);
-    if (!host) continue;
-
-    const session = { path: "/", sameSite: "lax" as const, secure: process.env.NODE_ENV === "production" };
-    response.cookies.set(HOST_COOKIE, host.slug, session);
-    response.cookies.set(HOST_NAME_COOKIE, host.name, session);
-    response.cookies.set(HOST_VIA_COOKIE, via, session);
-
-    if (via === "storefront" && !isBot(request.headers.get("user-agent"))) {
-      const seen = (request.cookies.get(SEEN_COOKIE)?.value ?? "").split(",").filter(Boolean);
-      if (!seen.includes(host.slug)) {
-        response.cookies.set(SEEN_COOKIE, [...seen, host.slug].slice(-30).join(","), { ...session, httpOnly: true });
-        event.waitUntil(
-          Promise.resolve(createAdminClient().rpc("record_storefront_visit", { p_host_id: host.id })).then(({ error }) => {
-            if (error) console.error("record_storefront_visit failed", error.message);
-          }),
-        );
-      }
-    }
-    return;
-  }
+  const visit = await applyAttribution(request, response, candidates);
+  if (visit) event.waitUntil(visit);
 }
 
 export const config = {
