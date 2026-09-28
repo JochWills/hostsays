@@ -17,6 +17,9 @@ Don't guess these. Ask Josh, then move the answer into the right doc.
 - [ ] Do host payouts need invoices from hosts?
 - [ ] Current Paystack fees and refund timelines for ZAR (check Paystack docs/dashboard)
 
+## Hosting
+- [ ] Before taking real bookings: stay on free Render/Supabase, or upgrade? (Free Render sleeps when idle; free Supabase pauses after ~a week of no activity.)
+
 ## Product
 - [ ] Support contact: email only, or also a phone/WhatsApp number?
 - [ ] Which areas go live first within the Eastern Cape coast?

@@ -74,7 +74,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 
 ## Phase 8 — Scheduled jobs
 - [ ] All cron jobs in `06-booking-flow.md`, protected with `CRON_SECRET`, idempotent
-- [ ] Render Cron Job in `render.yaml` (every 15 min, calls `/api/cron/*` with `CRON_SECRET`; share the secret with the web service)
+- [ ] Supabase Cron schedule (pg_cron + pg_net, every 15 min) calling `/api/cron/*` with `CRON_SECRET` from Supabase Vault
 
 ## Phase 9 — Reviews
 - [ ] Review form from completed bookings

@@ -6,7 +6,7 @@ services:
     name: hostsays
     runtime: node
     region: frankfurt # closest Render region to the Supabase project (eu-west-1, Ireland)
-    plan: starter # paid, so the site never sleeps (guests and Paystack webhooks need it awake)
+    plan: free # sleeps after ~15 min idle; consider "starter" before taking real bookings
     branch: main
     autoDeploy: true
     buildCommand: npm ci && npm run build
@@ -38,7 +38,6 @@ services:
       - key: ADMIN_EMAIL
         sync: false
       - key: CRON_SECRET
-        generateValue: true
+        sync: false # same value is stored in Supabase Vault for Supabase Cron
 
-  # Phase 8 adds the scheduled jobs here: a `type: cron` service on "*/15 * * * *" that calls
-  # /api/cron/* with CRON_SECRET (use `fromService` to share the web service's value).
+  # Scheduled jobs run from Supabase Cron (free), not a Render cron service. See docs/06-booking-flow.md.
