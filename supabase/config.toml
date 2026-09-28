@@ -413,3 +413,27 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# Hosted project overrides (applied with `supabase config push`).
+[remotes.production]
+project_id = "dbcvagwmyofmlricojdb"
+
+[remotes.production.auth]
+site_url = "https://hostsays.onrender.com"
+additional_redirect_urls = [
+  "https://hostsays.onrender.com/auth/callback",
+  "http://localhost:3000/auth/callback",
+]
+
+# Keep the hosted project's stricter defaults (the local settings above are for development).
+[remotes.production.auth.email]
+enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 8
+
+[remotes.production.auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[remotes.production.storage.analytics]
+enabled = true
