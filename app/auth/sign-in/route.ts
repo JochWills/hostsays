@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { homeForRole, safeNext } from "@/lib/auth";
 import { backToLogin, isSameOrigin } from "@/lib/auth-routes";
+import { publicUrl } from "@/lib/request-url";
 import { completeSignup } from "@/lib/signup";
 import { passwordSignIn } from "@/lib/validation/auth";
 
@@ -29,5 +30,5 @@ export async function POST(request: NextRequest) {
     await supabase.auth.signOut();
     return backToLogin(request, { error: "no-account", email });
   }
-  return NextResponse.redirect(new URL(next ?? homeForRole(role), request.url), 303);
+  return NextResponse.redirect(publicUrl(next ?? homeForRole(role), request), 303);
 }

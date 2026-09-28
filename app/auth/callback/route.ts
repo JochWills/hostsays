@@ -3,6 +3,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { homeForRole, safeNext } from "@/lib/auth";
 import { backToLogin } from "@/lib/auth-routes";
+import { publicUrl } from "@/lib/request-url";
 import { completeSignup } from "@/lib/signup";
 
 /**
@@ -35,5 +36,5 @@ export async function GET(request: NextRequest) {
     await supabase.auth.signOut();
     return backToLogin(request, { error: "no-account" });
   }
-  return NextResponse.redirect(new URL(next ?? homeForRole(role), request.url));
+  return NextResponse.redirect(publicUrl(next ?? homeForRole(role), request));
 }

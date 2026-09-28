@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MailCheck } from "lucide-react";
 import { signUp, type SignupState } from "./actions";
@@ -41,6 +41,15 @@ export function SignupForm({ type, areas }: Props) {
   const [state, action, pending] = useActionState<SignupState, FormData>(signUp, {});
   const errors = state.errors ?? {};
   const values = state.values ?? {};
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // After a failed submit, bring the first problem into view (on a phone it can be far above the button).
+  useEffect(() => {
+    if (!state.errors) return;
+    const first = formRef.current?.querySelector<HTMLElement>("[aria-invalid=true], [role=alert]");
+    first?.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (first?.matches("input, select")) first.focus({ preventScroll: true });
+  }, [state]);
 
   if (state.sentTo) {
     return (
@@ -111,14 +120,8 @@ export function SignupForm({ type, areas }: Props) {
   );
 
   return (
-    <form action={action} className={`${panel} mt-6 space-y-4`} noValidate>
+    <form ref={formRef} action={action} className={`${panel} mt-6 space-y-4`} noValidate>
       <input type="hidden" name="type" value={type} />
-
-      {errors.form && (
-        <p role="alert" className="rounded-[10px] border border-gold/50 bg-gold/10 px-4 py-3 text-[14px]">
-          {errors.form}
-        </p>
-      )}
 
       {field(
         "fullName",
@@ -267,6 +270,12 @@ export function SignupForm({ type, areas }: Props) {
           </p>
         )}
       </div>
+
+      {errors.form && (
+        <p role="alert" className="rounded-[10px] border border-gold/50 bg-gold/10 px-4 py-3 text-[14px]">
+          {errors.form}
+        </p>
+      )}
 
       <button type="submit" disabled={pending} className={`${btnPrimary} w-full`}>
         {pending ? "Creating your account…" : "Create account"}

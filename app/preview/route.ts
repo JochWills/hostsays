@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { PREVIEW_COOKIE, matchesPreviewKey } from "@/lib/preview";
+import { publicUrl } from "@/lib/request-url";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
  * /preview?off locks it again. A wrong key just lands on the coming-soon page.
  */
 export async function GET(request: NextRequest) {
-  const response = NextResponse.redirect(new URL("/", request.url));
+  const response = NextResponse.redirect(publicUrl("/", request));
   const params = request.nextUrl.searchParams;
   const key = params.get("key");
 
