@@ -65,6 +65,8 @@
 | `/operator/statements` | Bookings and deposits collected by HostSays |
 | `/operator/settings` | Business details, team, notification email, accept operator terms |
 
+Every portal also has a settings page with **Your details** (name, phone) and **Password** (set or change): `/operator/settings`, `/host/settings`, `/admin/settings`, `/account/settings`. When signed in, the header's "Sign in" and "List your experience" are replaced by a profile menu (Dashboard, Settings, Sign out), loaded from `/api/me` after the page loads so public pages stay static.
+
 ### Admin (`role = admin`)
 | Route | Page |
 |---|---|

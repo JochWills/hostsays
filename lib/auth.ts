@@ -27,6 +27,11 @@ export function homeForRole(role: Role | null): string {
   return "/";
 }
 
+export function settingsForRole(role: Role | null): string {
+  if (role === "guest") return "/account/settings";
+  return role ? `${homeForRole(role)}/settings` : "/";
+}
+
 /** Only allow same-site paths as a post-login destination (no open redirects). */
 export function safeNext(value: FormDataEntryValue | string | null | undefined): string | null {
   if (typeof value !== "string") return null;

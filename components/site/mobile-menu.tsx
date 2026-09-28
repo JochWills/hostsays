@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { MobileAccountLinks } from "./account-menu";
 import { MAIN_NAV } from "./nav-links";
 
 export function MobileMenu() {
@@ -47,16 +48,7 @@ export function MobileMenu() {
                 {l.label}
               </Link>
             ))}
-            <Link href="/login" onClick={() => setOpen(false)} className="rounded-[10px] px-3 py-3 font-medium hover:bg-bg">
-              Sign in
-            </Link>
-            <Link
-              href="/for-operators"
-              onClick={() => setOpen(false)}
-              className="mt-2 rounded-[14px] bg-green px-[26px] py-[13px] text-center font-semibold text-green-ink"
-            >
-              List your experience
-            </Link>
+            <MobileAccountLinks onNavigate={() => setOpen(false)} />
           </nav>
         </div>
       )}

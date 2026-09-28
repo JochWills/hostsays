@@ -50,28 +50,28 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Requests: accept / offer another time / decline with countdown
 - [ ] One-tap links `/r/[token]` (signed, expiring, GET shows, POST acts) for requests, weekly availability and mark completed
 - [ ] Bookings: complete, no-show, cancel (weather flag)
-- [ ] Experiences CRUD with photo upload → submit for approval; live edits go to `pending_changes`
-- [ ] Availability: weekly slots, capacity, blackouts, close a slot / change spots left on a date
+- [ ] Experiences CRUD with photo upload → submit for approval; live edits go to `pending_changes` — _done except live edits: details and photos of live/in-review listings are locked ("email us") until `pending_changes` is built._
+- [ ] Availability: weekly slots, capacity, blackouts, close a slot / change spots left on a date — _weekly times and closed dates done (on each experience); per-date slot overrides need the Phase 4 migration._
 - [ ] Calendar import (safe .ics fetch) and private calendar export feed
 - [ ] Statements
-- [ ] Operator terms acceptance
+- [x] Operator terms acceptance (at sign-up; shown in settings)
 - [ ] Operator emails
 
 ## Phase 6 — Host portal
 - [x] Apply form → pending application (done as `/signup?as=host`, with operators and optional guest accounts)
-- [ ] Dashboard stats
-- [ ] Picks: recommend, tip (≤200 chars), reorder, remove
-- [ ] Storefront settings + preview
-- [ ] Share tools: link, QR PNG, printable A5/A6 room card, welcome text
+- [ ] Dashboard stats — _visits, picks and commission rate shown; booking numbers arrive with bookings._
+- [x] Picks: recommend, tip (≤200 chars), reorder, remove
+- [x] Storefront settings + preview (photo, welcome note, link to the live page)
+- [ ] Share tools: link, QR PNG, printable A5/A6 room card, welcome text — _link, QR (SVG + PNG download) and welcome text done; room card still to do._
 - [ ] Earnings table + statements
-- [ ] Team (staff invites) and banking details
+- [ ] Team (staff invites) and banking details — _banking details done; team invites still to do._
 - [ ] Host emails
 
 ## Phase 7 — Admin
-- [ ] Approvals (hosts, operators, listings, listing edits) — _hosts and operators done early on `/admin` (Verify / Reject); listings and listing edits still to do._
+- [ ] Approvals (hosts, operators, listings, listing edits) — _hosts, operators and new listings done at `/admin/approvals` (listing review page at `/admin/experiences/[id]`); live listing edits still to do._
 - [ ] Create operator + experiences on behalf; send claim invite
 - [ ] Bookings search + manual status override + refunds
-- [ ] Hosts: verify, suspend, commission rate
+- [ ] Hosts: verify, suspend, commission rate — _verify/suspend done; commission rate edit still to do._
 - [ ] Recommendations moderation
 - [ ] Content: areas, categories, homepage featured items
 - [ ] Payouts: monthly draft, CSV export, mark paid, statements

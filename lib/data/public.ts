@@ -191,6 +191,13 @@ export async function getExperiencesByArea(areaId: string): Promise<ExperienceCa
   return rows.map(toExperienceCard).sort(byMostRecommended);
 }
 
+/** Every live experience, most recommended first (hosts choosing picks). */
+export async function getAllLiveExperiences(): Promise<ExperienceCard[]> {
+  const db = createPublicClient();
+  const rows = orThrow(await db.from("experience_cards").select("*"), "live experiences");
+  return rows.map(toExperienceCard).sort(byMostRecommended);
+}
+
 export async function getExperiencesByOperator(operatorId: string): Promise<ExperienceCard[]> {
   const db = createPublicClient();
   const rows = orThrow(await db.from("experience_cards").select("*").eq("operator_id", operatorId), "operator experiences");

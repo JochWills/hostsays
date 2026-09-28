@@ -29,6 +29,130 @@ export async function getMyOperator(userId: string): Promise<Membership | null> 
   return data?.operators ?? null;
 }
 
+// ---------- Operator ----------
+
+export async function getOperatorSettings(operatorId: string) {
+  const db = await createClient();
+  const [{ data: op }, { data: priv }] = await Promise.all([
+    db.from("operators").select("id, name, slug, area_id, description, website, status").eq("id", operatorId).single(),
+    db.from("operator_private").select("contact_email, contact_phone, terms_accepted_at").eq("operator_id", operatorId).single(),
+  ]);
+  if (!op || !priv) throw new Error("operator not found");
+  return { ...op, ...priv };
+}
+
+export type OperatorExperience = {
+  id: string;
+  slug: string;
+  title: string;
+  status: Enum<"listing_status">;
+  priceCents: number;
+  isGroupPrice: boolean;
+  photoPath: string | null;
+  slotCount: number;
+  updatedAt: string;
+};
+
+export async function getOperatorExperiences(operatorId: string): Promise<OperatorExperience[]> {
+  const db = await createClient();
+  const { data, error } = await db
+    .from("experiences")
+    .select("id, slug, title, status, price_cents, is_group_price, updated_at, experience_photos(path, sort_order), experience_slots(id)")
+    .eq("operator_id", operatorId)
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(`experiences: ${error.message}`);
+  return data.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    title: e.title,
+    status: e.status,
+    priceCents: e.price_cents,
+    isGroupPrice: e.is_group_price,
+    photoPath: [...e.experience_photos].sort((a, b) => a.sort_order - b.sort_order)[0]?.path ?? null,
+    slotCount: e.experience_slots.length,
+    updatedAt: e.updated_at,
+  }));
+}
+
+/** One of the signed-in operator's experiences, with photos, weekly times and closed dates. RLS keeps it to their own. */
+export async function getExperienceForEdit(id: string) {
+  const db = await createClient();
+  const { data, error } = await db
+    .from("experiences")
+    .select("*, experience_photos(id, path, alt, sort_order), experience_slots(id, weekday, start_time, capacity), experience_blackouts(date, reason)")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`experience: ${error.message}`);
+  if (!data) return null;
+  return {
+    ...data,
+    experience_photos: [...data.experience_photos].sort((a, b) => a.sort_order - b.sort_order),
+    experience_slots: [...data.experience_slots].sort((a, b) => a.weekday - b.weekday || a.start_time.localeCompare(b.start_time)),
+    experience_blackouts: [...data.experience_blackouts].sort((a, b) => a.date.localeCompare(b.date)),
+  };
+}
+
+// ---------- Host ----------
+
+export async function getHostSettings(hostId: string) {
+  const db = await createClient();
+  const [{ data: host }, { data: priv }, { data: bank }] = await Promise.all([
+    db.from("hosts").select("id, name, slug, type, area_id, photo_path, welcome_note, status").eq("id", hostId).single(),
+    db.from("host_private").select("contact_email, contact_phone, listing_url, commission_rate").eq("host_id", hostId).single(),
+    db.from("host_bank_details").select("account_name, bank_name, account_number, branch_code, confirmed").eq("host_id", hostId).maybeSingle(),
+  ]);
+  if (!host || !priv) throw new Error("host not found");
+  return { ...host, ...priv, bank };
+}
+
+export type HostPick = {
+  id: string;
+  tip: string;
+  sortOrder: number;
+  isHidden: boolean;
+  experience: { id: string; slug: string; title: string; operatorName: string; areaName: string; priceCents: number; isGroupPrice: boolean; photoPath: string | null; live: boolean };
+};
+
+export async function getHostPicks(hostId: string): Promise<HostPick[]> {
+  const db = await createClient();
+  const { data, error } = await db
+    .from("recommendations")
+    .select("id, tip, sort_order, is_hidden, experiences(id, slug, title, status, price_cents, is_group_price, operators(name), areas(name), experience_photos(path, sort_order))")
+    .eq("host_id", hostId)
+    .order("sort_order")
+    .order("created_at");
+  if (error) throw new Error(`picks: ${error.message}`);
+  return data.flatMap((r) => {
+    const e = r.experiences;
+    if (!e) return []; // no longer readable (e.g. taken down)
+    return [{
+      id: r.id,
+      tip: r.tip,
+      sortOrder: r.sort_order,
+      isHidden: r.is_hidden,
+      experience: {
+        id: e.id,
+        slug: e.slug,
+        title: e.title,
+        operatorName: e.operators?.name ?? "",
+        areaName: e.areas?.name ?? "",
+        priceCents: e.price_cents,
+        isGroupPrice: e.is_group_price,
+        photoPath: [...e.experience_photos].sort((a, b) => a.sort_order - b.sort_order)[0]?.path ?? null,
+        live: e.status === "live",
+      },
+    }];
+  });
+}
+
+/** Storefront visits over the last `days` days. */
+export async function getStorefrontVisits(hostId: string, days = 30): Promise<number> {
+  const db = await createClient();
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const { data } = await db.from("storefront_visits").select("count").eq("host_id", hostId).gte("day", since);
+  return (data ?? []).reduce((sum, r) => sum + r.count, 0);
+}
+
 // ---------- Admin ----------
 
 export type PendingHost = {
@@ -99,4 +223,74 @@ export async function getPendingApplications(): Promise<{ hosts: PendingHost[]; 
       createdAt: o.created_at,
     })),
   };
+}
+
+export type PendingListing = { id: string; slug: string; title: string; operatorName: string; areaName: string; priceCents: number; isGroupPrice: boolean; photoCount: number; slotCount: number; updatedAt: string };
+
+/** Experiences submitted for review, oldest first. Callers must check the admin role first. */
+export async function getPendingListings(): Promise<PendingListing[]> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("experiences")
+    .select("id, slug, title, price_cents, is_group_price, updated_at, operators(name), areas(name), experience_photos(id), experience_slots(id)")
+    .eq("status", "pending_review")
+    .order("updated_at");
+  if (error) throw new Error(`pending listings: ${error.message}`);
+  return data.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    title: e.title,
+    operatorName: e.operators?.name ?? "",
+    areaName: e.areas?.name ?? "",
+    priceCents: e.price_cents,
+    isGroupPrice: e.is_group_price,
+    photoCount: e.experience_photos.length,
+    slotCount: e.experience_slots.length,
+    updatedAt: e.updated_at,
+  }));
+}
+
+export async function getAdminCounts() {
+  const db = createAdminClient();
+  const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
+  const [pendingHosts, pendingOperators, pendingListings, liveExperiences, verifiedHosts, verifiedOperators, guests] = await Promise.all([
+    count(db.from("hosts").select("id", { count: "exact", head: true }).eq("status", "pending")),
+    count(db.from("operators").select("id", { count: "exact", head: true }).eq("status", "pending").eq("is_demo", false)),
+    count(db.from("experiences").select("id", { count: "exact", head: true }).eq("status", "pending_review")),
+    count(db.from("experiences").select("id", { count: "exact", head: true }).eq("status", "live")),
+    count(db.from("hosts").select("id", { count: "exact", head: true }).eq("status", "verified")),
+    count(db.from("operators").select("id", { count: "exact", head: true }).eq("status", "verified")),
+    count(db.from("profiles").select("id", { count: "exact", head: true }).eq("role", "guest")),
+  ]);
+  return { pendingHosts, pendingOperators, pendingListings, pendingTotal: pendingHosts + pendingOperators + pendingListings, liveExperiences, verifiedHosts, verifiedOperators, guests };
+}
+
+export async function getAllHostsForAdmin() {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("hosts")
+    .select("id, slug, name, type, status, created_at, areas(name), host_private(contact_email, commission_rate), recommendations(id)")
+    .order("name");
+  if (error) throw new Error(`hosts: ${error.message}`);
+  return data;
+}
+
+export async function getAllOperatorsForAdmin() {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("operators")
+    .select("id, slug, name, status, is_demo, created_at, areas(name), operator_private(contact_email), experiences(id, status)")
+    .order("name");
+  if (error) throw new Error(`operators: ${error.message}`);
+  return data;
+}
+
+export async function getAllExperiencesForAdmin() {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("experiences")
+    .select("id, slug, title, status, price_cents, is_group_price, updated_at, operators(name, status), areas(name), recommendations(id)")
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(`experiences: ${error.message}`);
+  return data;
 }

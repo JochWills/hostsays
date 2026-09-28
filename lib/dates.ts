@@ -26,3 +26,7 @@ export function weekdayOf(isoDate: string): number {
 export function isIsoDate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
 }
+
+/** Index = experience_slots.weekday (0 = Sunday). Displayed Monday first. */
+export const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+export const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0] as const;

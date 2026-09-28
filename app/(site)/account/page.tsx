@@ -1,21 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Luggage } from "lucide-react";
 import { requireRole } from "@/lib/auth";
-import { PortalPlaceholder } from "@/components/site/portal-placeholder";
+import { ComingSoon, PageHeading } from "@/components/portal/ui";
 
-export const metadata: Metadata = { title: "Your account", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Your trips", robots: { index: false, follow: false } };
 
-export default async function GuestAccount() {
-  const user = await requireRole("guest", "/account");
+export default async function GuestTrips() {
+  await requireRole("guest", "/account");
   return (
-    <PortalPlaceholder user={user} title="Your account">
-      <p>
-        Welcome! Your bookings will show here once bookings open. Until then,{" "}
-        <Link href="/explore" className="font-semibold text-green hover:underline">
-          explore experiences
-        </Link>{" "}
-        recommended by local hosts.
-      </p>
-    </PortalPlaceholder>
+    <>
+      <PageHeading title="Your trips" />
+      <ComingSoon icon={Luggage} title="Bookings open soon" action={{ href: "/explore", label: "Explore experiences" }}>
+        <p>Once bookings open, every trip you book with this email address will show here: requests, vouchers and receipts.</p>
+      </ComingSoon>
+    </>
   );
 }

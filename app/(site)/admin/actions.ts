@@ -4,32 +4,51 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Enum } from "@/lib/supabase/types";
 
-const decision = z.object({
+/** Public pages that list hosts, operators or experiences (otherwise cached for up to 5 minutes). */
+function refreshSite() {
+  revalidatePath("/", "layout");
+}
+
+const accountDecision = z.object({
   kind: z.enum(["host", "operator"]),
   id: z.uuid(),
-  verdict: z.enum(["verified", "rejected"]),
+  status: z.enum(["verified", "rejected", "suspended"]),
 });
 
-/** Admin verifies or rejects a pending host or operator. Only changes rows that are still pending. */
-export async function decideApplication(form: FormData) {
+/** Verify, reject or suspend a host or operator (and reinstate a suspended one with "verified"). */
+export async function setAccountStatus(form: FormData) {
   await requireRole("admin", "/admin");
-  const parsed = decision.safeParse({ kind: form.get("kind"), id: form.get("id"), verdict: form.get("verdict") });
+  const parsed = accountDecision.safeParse({ kind: form.get("kind"), id: form.get("id"), status: form.get("status") });
   if (!parsed.success) return;
-
-  const { kind, id, verdict } = parsed.data;
+  const { kind, id, status } = parsed.data;
   const db = createAdminClient();
+
   const { error } =
     kind === "host"
       ? await db
           .from("hosts")
-          .update({ status: verdict, verified_at: verdict === "verified" ? new Date().toISOString() : null })
+          .update(status === "verified" ? { status, verified_at: new Date().toISOString() } : { status })
           .eq("id", id)
-          .eq("status", "pending")
-      : await db.from("operators").update({ status: verdict }).eq("id", id).eq("status", "pending");
+      : await db.from("operators").update({ status }).eq("id", id);
   if (error) throw new Error(`Couldn't update ${kind}: ${error.message}`);
+  revalidatePath("/admin", "layout");
+  refreshSite();
+}
 
-  revalidatePath("/admin");
-  // Verified hosts and operators appear on public pages (cached for up to 5 minutes otherwise).
-  if (verdict === "verified") revalidatePath("/", "layout");
+const listingDecision = z.object({ id: z.uuid(), status: z.enum(["live", "rejected", "paused"]) });
+
+/** Approve (live), send back (rejected) or pause a listing. Approving only works on listings in review or paused. */
+export async function setListingStatus(form: FormData) {
+  await requireRole("admin", "/admin");
+  const parsed = listingDecision.safeParse({ id: form.get("id"), status: form.get("status") });
+  if (!parsed.success) return;
+  const { id, status } = parsed.data;
+  const from: Enum<"listing_status">[] = status === "live" ? ["pending_review", "paused"] : status === "rejected" ? ["pending_review"] : ["live"];
+  const db = createAdminClient();
+  const { error } = await db.from("experiences").update({ status }).eq("id", id).in("status", from);
+  if (error) throw new Error(`Couldn't update listing: ${error.message}`);
+  revalidatePath("/admin", "layout");
+  refreshSite();
 }

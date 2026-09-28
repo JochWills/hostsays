@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { HeaderAccount } from "./account-menu";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { StayingPill } from "./staying-pill";
@@ -33,17 +34,7 @@ export function Header({ variant = "solid", stayingAt = null }: Props) {
         <Link href="/explore" aria-label="Search experiences" className="grid place-items-center p-1.5">
           <Search size={20} strokeWidth={1.8} />
         </Link>
-        <Link href="/login" className="hidden md:inline">
-          Sign in
-        </Link>
-        <Link
-          href="/for-operators"
-          className={`hidden items-center gap-2.5 rounded-[14px] px-[26px] py-[13px] font-semibold whitespace-nowrap hover:brightness-110 sm:inline-flex ${
-            overlay ? "border border-white/10 bg-[#2D4A3E] text-white" : "bg-green text-green-ink"
-          }`}
-        >
-          List your experience
-        </Link>
+        <HeaderAccount overlay={overlay} />
         <MobileMenu />
       </div>
     </div>

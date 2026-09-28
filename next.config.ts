@@ -5,6 +5,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54
 const nextConfig: NextConfig = {
   // Pin the project root so a stray lockfile higher up the tree isn't picked up.
   turbopack: { root: __dirname },
+  experimental: {
+    // Photo uploads from the portals go through server actions (bucket limit is 5 MB, plus form overhead).
+    serverActions: { bodySizeLimit: "6mb" },
+  },
   images: {
     // Photos come from the public Supabase Storage buckets.
     remotePatterns: [new URL(`${supabaseUrl}/storage/v1/object/public/**`)],

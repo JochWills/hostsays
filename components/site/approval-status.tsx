@@ -4,13 +4,7 @@ import type { Membership } from "@/lib/data/portal";
 export function ApprovalStatus({ membership, kind }: { membership: Membership | null; kind: "host" | "operator" }) {
   if (!membership) return null;
   const { status, name } = membership;
-  if (status === "verified") {
-    return (
-      <p className="mb-4 rounded-[10px] bg-green/10 px-4 py-3 text-[14px]">
-        <strong>{name}</strong> is verified.
-      </p>
-    );
-  }
+  if (status === "verified") return null;
   const message =
     status === "pending"
       ? kind === "host"
@@ -20,7 +14,7 @@ export function ApprovalStatus({ membership, kind }: { membership: Membership | 
         ? "We couldn't verify your details. Please reply to our email or contact us so we can sort it out."
         : "Your account is paused. Please contact us.";
   return (
-    <p className="mb-4 rounded-[10px] border border-gold/50 bg-gold/10 px-4 py-3 text-[14px]">
+    <p className="mb-6 rounded-[10px] border border-gold/50 bg-gold/10 px-4 py-3 text-[14px]">
       <strong>{name}</strong>: {message}
     </p>
   );
