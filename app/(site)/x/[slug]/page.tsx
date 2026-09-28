@@ -11,7 +11,7 @@ import { Stars } from "@/components/ui/stars";
 import { btnPrimary, pageTitle } from "@/components/ui/styles";
 import { categoryLabel } from "@/lib/categories";
 import { MIN_REVIEWS_TO_SHOW } from "@/lib/config";
-import { getExperienceBySlug, getExperiencesByOperator, getHostsAlsoRecommend } from "@/lib/data/public";
+import { getExperienceBySlug, getExperiencesByOperator, getHostCards, getHostsAlsoRecommend } from "@/lib/data/public";
 import { addDays, minBookableDate } from "@/lib/dates";
 import { formatDuration, formatRand } from "@/lib/format";
 import { CANCELLATION_POLICY } from "@/lib/policy";
@@ -47,10 +47,15 @@ export default async function ExperiencePage({ params }: PageProps<"/x/[slug]">)
   if (!e) notFound();
 
   const hostIds = e.recommendations.map((r) => r.host.id);
-  const [fromOperator, alsoRecommended] = await Promise.all([
+  const [fromOperator, alsoRecommended, allHosts] = await Promise.all([
     getExperiencesByOperator(e.operator.id),
     getHostsAlsoRecommend(e.id, hostIds),
+    getHostCards(),
   ]);
+  // For "Where are you staying?": every verified host, grouped by area in the form.
+  const hostOptions = allHosts
+    .map((h) => ({ slug: h.slug, name: h.name, area: h.area?.name ?? "Other" }))
+    .sort((a, b) => a.area.localeCompare(b.area) || a.name.localeCompare(b.name));
   const moreFromOperator = fromOperator.filter((x) => x.id !== e.id).slice(0, 4);
   const hostCount = e.recommendations.length;
   const showReviews = e.reviewCount >= MIN_REVIEWS_TO_SHOW && e.rating != null;
@@ -250,6 +255,7 @@ export default async function ExperiencePage({ params }: PageProps<"/x/[slug]">)
             blackoutDates={e.blackoutDates}
             minDate={minDate}
             maxDate={addDays(minDate, 365)}
+            hosts={hostOptions}
           />
         </aside>
       </div>

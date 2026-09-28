@@ -9,11 +9,9 @@ import { MAIN_NAV } from "./nav-links";
 type Props = {
   /** `overlay` sits transparent over the homepage hero; `solid` is used everywhere else. */
   variant?: "overlay" | "solid";
-  /** Name of the host remembered this session (Phase 3 fills this from the `hs_host` cookie). */
-  stayingAt?: string | null;
 };
 
-export function Header({ variant = "solid", stayingAt = null }: Props) {
+export function Header({ variant = "solid" }: Props) {
   const overlay = variant === "overlay";
 
   const inner = (
@@ -30,7 +28,7 @@ export function Header({ variant = "solid", stayingAt = null }: Props) {
         ))}
       </nav>
       <div className="ml-auto flex items-center gap-2.5 text-[14.5px] font-medium sm:gap-[26px]">
-        {stayingAt && <StayingPill hostName={stayingAt} variant={variant} />}
+        <StayingPill variant={variant} />
         <Link href="/explore" aria-label="Search experiences" className="grid place-items-center p-1.5">
           <Search size={20} strokeWidth={1.8} />
         </Link>

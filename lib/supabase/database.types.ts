@@ -1432,6 +1432,10 @@ export type Database = {
           status: Database["public"]["Enums"]["booking_status"]
         }[]
       }
+      record_storefront_visit: {
+        Args: { p_host_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       approval_status: "pending" | "verified" | "rejected" | "suspended"

@@ -6,15 +6,21 @@ import { computeBookingAmounts } from "@/lib/bookings/pricing";
 import { DEPOSIT_RATE } from "@/lib/config";
 import { formatDate, formatPercent, formatRand, formatTime } from "@/lib/format";
 import { requestNote } from "@/lib/policy";
-import { btnPrimary, label } from "@/components/ui/styles";
+import { btnPrimary, input, label } from "@/components/ui/styles";
+import { useStayingHost } from "@/components/site/staying-pill";
 import { AvailabilityCalendar } from "./availability-calendar";
 
 type Slot = { weekday: number; start_time: string };
 
+type HostOption = { slug: string; name: string; area: string };
+
+/** "Somewhere else / not listed": no host is credited. */
+export const NO_HOST = "none";
+
 /**
- * Booking panel. Phase 2: pick a date, time and group size and see the price.
- * Phase 3 adds "Where are you staying?", Phase 4 adds guest details and sends the request
- * (the server recomputes every amount; these are a preview).
+ * Booking panel: pick a date, time and group size, see the price, and say where you're staying (pre-filled
+ * with the host remembered this session, changeable). Phase 4 adds guest details and sends the request
+ * (the server recomputes every amount and re-checks the host; these are a preview).
  */
 export function BookingPanel({
   operatorName,
@@ -26,6 +32,7 @@ export function BookingPanel({
   blackoutDates,
   minDate,
   maxDate,
+  hosts,
 }: {
   operatorName: string;
   priceCents: number;
@@ -36,10 +43,17 @@ export function BookingPanel({
   blackoutDates: string[];
   minDate: string;
   maxDate: string;
+  hosts: HostOption[];
 }) {
   const [date, setDate] = useState<string | null>(null);
   const [time, setTime] = useState<string | null>(null);
   const [people, setPeople] = useState(Math.max(minPeople, Math.min(2, maxPeople)));
+  // "" = not answered yet. Until the guest picks something, follow the remembered host (and its clearing).
+  const [hostChoice, setHostChoice] = useState("");
+  const staying = useStayingHost();
+  const rememberedSlug = staying && hosts.some((h) => h.slug === staying.slug) ? staying.slug : "";
+  const hostValue = hostChoice || rememberedSlug;
+  const areas = useMemo(() => [...new Set(hosts.map((h) => h.area))], [hosts]);
 
   const openWeekdays = useMemo(() => [...new Set(slots.map((s) => s.weekday))], [slots]);
   const times = date
@@ -123,6 +137,34 @@ export function BookingPanel({
             <Plus size={16} strokeWidth={1.8} />
           </button>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="staying" className={label}>
+          Where are you staying?
+        </label>
+        <select id="staying" name="host" value={hostValue} onChange={(e) => setHostChoice(e.target.value)} className={input}>
+          <option value="" disabled>
+            Choose your accommodation
+          </option>
+          {areas.map((area) => (
+            <optgroup key={area} label={area}>
+              {hosts
+                .filter((h) => h.area === area)
+                .map((h) => (
+                  <option key={h.slug} value={h.slug}>
+                    {h.name}
+                  </option>
+                ))}
+            </optgroup>
+          ))}
+          <option value={NO_HOST}>Somewhere else / not listed</option>
+        </select>
+        <p className="mt-1.5 text-[12.5px] text-muted">
+          {hostValue && hostValue !== NO_HOST
+            ? "Your host earns a small commission when you book. It doesn't change your price."
+            : "If your host is on HostSays, pick them: they earn a small commission at no cost to you."}
+        </p>
       </div>
 
       <dl className="mt-5 space-y-1.5 border-t border-line pt-4 text-[14px]">

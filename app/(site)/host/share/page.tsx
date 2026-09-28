@@ -23,9 +23,11 @@ export default async function HostShare() {
   }
 
   const url = absoluteUrl(`/${host.slug}`);
+  // The QR carries utm_source=qr so scans can be told apart in analytics; it's still a storefront visit.
+  const qrUrl = `${url}?utm_source=qr`;
   const [svg, png] = await Promise.all([
-    QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#1e2723", light: "#ffffff" } }),
-    QRCode.toDataURL(url, { width: 1200, margin: 2, color: { dark: "#1e2723", light: "#ffffff" } }),
+    QRCode.toString(qrUrl, { type: "svg", margin: 1, color: { dark: "#1e2723", light: "#ffffff" } }),
+    QRCode.toDataURL(qrUrl, { width: 1200, margin: 2, color: { dark: "#1e2723", light: "#ffffff" } }),
   ]);
   const message = `Welcome to ${host.name}! We've put together our favourite local experiences, from game drives to ocean trips, run by people we know and trust. Have a look and book here: ${url}`;
 

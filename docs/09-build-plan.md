@@ -29,10 +29,10 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [x] SEO: metadata, sitemap, robots, JSON-LD, OG images
 
 ## Phase 3 — Host attribution
-- [ ] Middleware sets `hs_host` session cookie from storefronts and `?ref=`
-- [ ] "Staying at" header pill with clear
-- [ ] Storefront visit counter
-- [ ] Booking form host select, pre-filled and changeable
+- [x] Proxy (`proxy.ts`) sets `hs_host` session cookie from verified storefronts and `?ref=` (last touch wins; link prefetches ignored)
+- [x] "Staying at" header pill with clear
+- [x] Storefront visit counter (once per session per host, bots skipped; `record_storefront_visit`)
+- [x] Booking form host select, pre-filled and changeable (grouped by area, plus "Somewhere else / not listed")
 
 ## Phase 4 — Booking engine
 - [ ] `lib/bookings/pricing.ts` (pure functions + unit tests for deposit/commission/rounding) — _functions written (used by the booking panel preview); no test runner or tests yet._
