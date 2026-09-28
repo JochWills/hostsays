@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, BedDouble, Compass, UserRound } from "lucide-react";
+import { ArrowRight, BedDouble, Compass, MailCheck, UserRound } from "lucide-react";
 import { getCurrentUser, homeForRole } from "@/lib/auth";
 import { getAllAreas } from "@/lib/data/public";
 import { firstValues } from "@/lib/validation/explore";
@@ -63,6 +63,28 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
 
   const params = firstValues(await searchParams);
   const type = ACCOUNT_TYPES.find((t) => t === params.as);
+
+  if (params.sent) {
+    return (
+      <div className="wrap flex justify-center pt-10 pb-16 sm:pt-16">
+        <div role="status" className={`${panel} w-full max-w-[460px] text-[15px]`}>
+          <MailCheck size={28} strokeWidth={1.8} className="text-green" aria-hidden="true" />
+          <h1 className="mt-3 text-[22px] font-extrabold tracking-[-0.02em]">Check your email</h1>
+          <p className="mt-2">
+            We&rsquo;ve sent a link to {params.email ? <strong>{params.email}</strong> : "your email"}. Tap it on this
+            device to confirm your email and finish signing up. It expires in an hour.
+          </p>
+          <p className="mt-3 text-[14px] text-muted">
+            Nothing there? Check your spam folder. If you already have an account with this email,{" "}
+            <Link href="/login" className="font-semibold text-green hover:underline">
+              sign in
+            </Link>{" "}
+            instead.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wrap flex justify-center pt-10 pb-16 sm:pt-16">

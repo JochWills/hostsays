@@ -2,7 +2,6 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { MailCheck } from "lucide-react";
 import { signUp, type SignupState } from "./actions";
 import { HOST_TYPES, type AccountType } from "@/lib/validation/auth";
 import { btnPrimary, input, label, panel } from "@/components/ui/styles";
@@ -50,26 +49,6 @@ export function SignupForm({ type, areas }: Props) {
     first?.scrollIntoView({ block: "center", behavior: "smooth" });
     if (first?.matches("input, select")) first.focus({ preventScroll: true });
   }, [state]);
-
-  if (state.sentTo) {
-    return (
-      <div role="status" className={`${panel} mt-6 text-[15px]`}>
-        <MailCheck size={28} strokeWidth={1.8} className="text-green" aria-hidden="true" />
-        <h2 className="mt-3 text-[18px] font-bold">Check your email</h2>
-        <p className="mt-2">
-          We&rsquo;ve sent a link to <strong>{state.sentTo}</strong>. Tap it to confirm your email and finish signing
-          up. It expires in an hour.
-        </p>
-        <p className="mt-3 text-[14px] text-muted">
-          Nothing there? Check your spam folder. If you already have an account with this email,{" "}
-          <Link href="/login" className="font-semibold text-green hover:underline">
-            sign in
-          </Link>{" "}
-          instead.
-        </p>
-      </div>
-    );
-  }
 
   const field = (name: string, text: string, el: React.ReactNode, hint?: string) => (
     <div>

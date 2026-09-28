@@ -12,8 +12,6 @@ export type SignupState = {
   errors?: Record<string, string>;
   /** What the person typed (never the password), so the form keeps it after an error. */
   values?: Record<string, string>;
-  /** Set once the confirmation email has been requested. */
-  sentTo?: string;
 };
 
 const FIELDS = ["type", "fullName", "name", "hostType", "areaId", "listingUrl", "website", "phone", "email"] as const;
@@ -76,5 +74,6 @@ export async function signUp(_prev: SignupState, form: FormData): Promise<Signup
 
   // Otherwise the confirmation email is on its way. (If the email already had an account, Supabase
   // sends nothing and returns the same answer, so this can't be used to find out who has an account.)
-  return { sentTo: email };
+  // Redirect rather than return state: signUp sets a cookie, and the refresh that triggers would reset the form.
+  redirect(`/signup?sent=1&email=${encodeURIComponent(email)}`);
 }
