@@ -18,7 +18,7 @@ services:
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
       - key: NEXT_PUBLIC_SITE_URL
-        sync: false # https://hostsays.com
+        sync: false # https://www.hostsays.com (Render redirects hostsays.com to www)
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY

@@ -419,7 +419,7 @@ enabled = true
 project_id = "dbcvagwmyofmlricojdb"
 
 [remotes.production.auth]
-site_url = "https://hostsays.com"
+site_url = "https://www.hostsays.com"
 additional_redirect_urls = [
   "https://hostsays.com/auth/callback",
   "https://www.hostsays.com/auth/callback",
