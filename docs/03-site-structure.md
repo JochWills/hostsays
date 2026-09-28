@@ -20,7 +20,7 @@
 | `/help` | FAQ | Guests, hosts, operators |
 | `/terms`, `/privacy`, `/cancellations`, `/operator-terms` | Legal | Placeholder content in development |
 
-### Guest (no account)
+### Guest (no account needed)
 | Route | Page |
 |---|---|
 | `/b/[token]` | Booking status, pay deposit, voucher, cancel, review — all on one page that changes by status |
@@ -36,7 +36,9 @@
 ### Auth
 | Route | Page |
 |---|---|
-| `/login` | Email magic link / password for hosts, operators, admin |
+| `/signup` | Choose guest / host / operator, then that sign-up form (`?as=guest\|host\|operator`). Sends a confirmation email |
+| `/login` | Email magic link / password for everyone with an account |
+| `/account` | Guest account (`role = guest`): their bookings (placeholder until bookings are built) |
 | `/auth/callback` | Supabase auth callback |
 | `/invite/[token]` | Accept an invite (host staff, operator claiming an admin-built account) |
 
@@ -82,7 +84,7 @@ Areas and hosts share the top-level namespace.
 2. Else look up `hosts.slug` where `status = 'verified'`. If found → render host storefront **and set session attribution** (see `07-host-attribution.md`).
 3. Else 404.
 
-**Reserved slugs** (block for hosts and areas): `explore, x, o, b, host, hosts, areas, for-hosts, for-operators, operator, operators, admin, login, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml`.
+**Reserved slugs** (block for hosts and areas): `explore, x, o, b, r, host, hosts, areas, for-hosts, for-operators, operator, operators, admin, login, signup, sign-up, join, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml, coming-soon, preview`.
 When a host picks a slug, also block any existing area slug and validate: lowercase letters, numbers and hyphens, 3–40 characters.
 
 ## Global UI

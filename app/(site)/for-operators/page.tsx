@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { btnPrimary } from "@/components/ui/styles";
 import { ProsePage } from "@/components/site/prose-page";
 import { CONFIRM_WINDOW_HOURS, DEPOSIT_RATE } from "@/lib/config";
 import { formatPercent } from "@/lib/format";
@@ -45,7 +47,11 @@ export default function ForOperatorsPage() {
         We review every listing before it goes live. If you&rsquo;d rather not do the setup, we can build your listing for
         you and hand it over.
       </p>
-      <p>Operator sign-up opens soon.</p>
+      <p>
+        <Link href="/signup?as=operator" className={`${btnPrimary} text-green-ink! no-underline!`}>
+          Sign up as an operator
+        </Link>
+      </p>
     </ProsePage>
   );
 }

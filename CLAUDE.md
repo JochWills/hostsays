@@ -36,7 +36,7 @@ You are building **HostSays** (hostsays.com): a marketplace where travellers dis
 - All percentages come from one config file (`lib/config.ts`), never hard-coded in components.
 - Every table has RLS enabled. Service-role key is used **only** in server code (webhooks, cron, admin actions).
 - Never trust the client for prices, deposits, commission or booking status. Compute them on the server.
-- Guests have **no accounts**. Guest booking pages are accessed by an unguessable token.
+- Guests **never need an account** to book. Guest booking pages are accessed by an unguessable token. Guest accounts are optional (see `02-business-rules.md` → Guests).
 - Keep copy warm, local and plain. South African English spelling (colour, favourite, organise).
 - Mobile-first. Most guests will book on their phones.
 - After finishing each phase in `docs/09-build-plan.md`, tick its checklist and summarise what changed.

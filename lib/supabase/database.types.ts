@@ -617,6 +617,7 @@ export type Database = {
           contact_phone: string | null
           host_id: string
           listing_url: string
+          terms_accepted_at: string | null
         }
         Insert: {
           commission_rate?: number
@@ -624,6 +625,7 @@ export type Database = {
           contact_phone?: string | null
           host_id: string
           listing_url: string
+          terms_accepted_at?: string | null
         }
         Update: {
           commission_rate?: number
@@ -631,6 +633,7 @@ export type Database = {
           contact_phone?: string | null
           host_id?: string
           listing_url?: string
+          terms_accepted_at?: string | null
         }
         Relationships: [
           {
@@ -1401,6 +1404,15 @@ export type Database = {
       }
     }
     Functions: {
+      complete_signup: {
+        Args: {
+          p_data: Json
+          p_email: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       host_bookings: {
         Args: never
         Returns: {
@@ -1460,7 +1472,7 @@ export type Database = {
         | "paused"
         | "rejected"
       payout_status: "draft" | "exported" | "paid"
-      user_role: "admin" | "host" | "operator"
+      user_role: "admin" | "host" | "operator" | "guest"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1620,7 +1632,7 @@ export const Constants = {
       ],
       listing_status: ["draft", "pending_review", "live", "paused", "rejected"],
       payout_status: ["draft", "exported", "paid"],
-      user_role: ["admin", "host", "operator"],
+      user_role: ["admin", "host", "operator", "guest"],
     },
   },
 } as const

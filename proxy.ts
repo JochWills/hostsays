@@ -3,7 +3,7 @@ import { COMING_SOON, PREVIEW_COOKIE, matchesPreviewKey } from "@/lib/preview";
 import { refreshSession } from "@/lib/supabase/proxy";
 
 // Signed-in areas. Public pages never read the session, so they skip the refresh and stay cacheable.
-const SESSION_PATHS = /^\/(admin|host|operator|login|auth)(\/|$)/;
+const SESSION_PATHS = /^\/(admin|host|operator|account|login|signup|auth)(\/|$)/;
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

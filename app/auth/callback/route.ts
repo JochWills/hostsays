@@ -3,8 +3,12 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { homeForRole, safeNext } from "@/lib/auth";
 import { backToLogin } from "@/lib/auth-routes";
+import { completeSignup } from "@/lib/signup";
 
-/** Where emailed links land: swaps the one-time code for a session, then sends the user to their portal. */
+/**
+ * Where emailed links land (sign-in links and sign-up confirmations): swaps the one-time code for a session,
+ * finishes a new sign-up, then sends the user to their portal.
+ */
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const next = safeNext(params.get("next"));
@@ -19,12 +23,17 @@ export async function GET(request: NextRequest) {
       ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
       : { data: { user: null }, error: new Error("missing code") };
 
-  if (error || !data.user) return backToLogin(request, { error: "link", next });
+  if (error || !data.user) {
+    // A confirmation link opened on another device still confirms the email (Supabase does that before
+    // redirecting here), it just can't sign in on this one. So point them to the password form.
+    return backToLogin(request, params.get("signup") ? { error: "confirm-elsewhere" } : { error: "link", next });
+  }
 
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
-  if (!profile) {
+  const role = profile?.role ?? (await completeSignup(data.user));
+  if (!role) {
     await supabase.auth.signOut();
     return backToLogin(request, { error: "no-account" });
   }
-  return NextResponse.redirect(new URL(next ?? homeForRole(profile.role), request.url));
+  return NextResponse.redirect(new URL(next ?? homeForRole(role), request.url));
 }

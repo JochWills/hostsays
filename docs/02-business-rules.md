@@ -57,7 +57,8 @@ Guests can only request dates and times the operator has set up (weekly time slo
 No sync is perfect, so request-to-book and "Offer another time" stay as the safety net.
 
 ## Guests
-- **No guest accounts.** Each booking has a secret token; the guest manages it at `/b/[token]`, linked from every email.
+- **Guests never need an account to book.** Each booking has a secret token; the guest manages it at `/b/[token]`, linked from every email.
+- **Optional guest accounts** (decided with Josh): a guest can sign up (`/signup?as=guest`) to see their bookings in one place at `/account`. Bookings are linked to an account by its **confirmed** email address (once bookings are built). The token link keeps working either way.
 - Guest provides: name, email, phone (WhatsApp number), group size, date, time slot, optional notes, and "Where are you staying?".
 
 ## Cancellations and no-shows
@@ -80,6 +81,14 @@ No sync is perfect, so request-to-book and "Offer another time" stay as the safe
 - **3 strikes in 90 days** → admin is notified to review and may suspend the operator.
 - Weather cancellations must include a reason and are not strikes.
 - Track average response time per operator (used for ranking later).
+
+## Sign-up
+- Anyone can sign up at `/signup` as a **guest**, **host** or **operator** (email + password; they must confirm their email).
+  - Host: name, property name, type, area, listing link (Booking.com/Airbnb/website), WhatsApp number.
+  - Operator: name, business name, area, website (optional), WhatsApp number. Their email receives booking requests.
+  - Everyone ticks the terms (operators: the operator terms). The time is stored.
+- Nothing is created until the email is confirmed: the details wait in the auth user's metadata, then become the profile and a **pending** host or operator (`public.complete_signup`).
+- **Admin verifies** hosts and operators at `/admin` (Verify / Reject). Pending and rejected ones never appear on the site. Pending operators can sign in and prepare listings; listings still need approval.
 
 ## Hosts
 - Any accommodation type can join: guesthouse, B&B, self-catering, Airbnb host, hotel, lodge.

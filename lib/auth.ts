@@ -23,6 +23,7 @@ export function homeForRole(role: Role | null): string {
   if (role === "admin") return "/admin";
   if (role === "host") return "/host";
   if (role === "operator") return "/operator";
+  if (role === "guest") return "/account";
   return "/";
 }
 

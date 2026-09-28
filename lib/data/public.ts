@@ -115,6 +115,12 @@ export async function getLiveAreas(): Promise<Area[]> {
   return orThrow(await db.from("areas").select("*").eq("is_live", true).order("sort_order"), "areas");
 }
 
+/** Every area (live or not), for sign-up forms. */
+export async function getAllAreas(): Promise<Pick<Area, "id" | "name">[]> {
+  const db = createPublicClient();
+  return orThrow(await db.from("areas").select("id, name").order("sort_order"), "areas");
+}
+
 export async function getAreaBySlug(slug: string): Promise<Area | null> {
   const db = createPublicClient();
   return oneOrNull(await db.from("areas").select("*").eq("slug", slug).maybeSingle(), "area");

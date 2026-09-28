@@ -46,7 +46,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Emails for all guest events (`08-emails.md`)
 
 ## Phase 5 — Operator portal
-- [ ] Auth (login, invites, roles), route protection — _started early: `/login` (password or emailed link), `/auth/callback`, sign-out, role guards and placeholder `/admin`, `/host`, `/operator` pages. Invites still to do._
+- [ ] Auth (login, invites, roles), route protection — _started early: `/login` (password or emailed link), `/auth/callback`, sign-out, role guards and placeholder `/admin`, `/host`, `/operator` pages; `/signup` for guests, hosts and operators. Invites still to do._
 - [ ] Requests: accept / offer another time / decline with countdown
 - [ ] One-tap links `/r/[token]` (signed, expiring, GET shows, POST acts) for requests, weekly availability and mark completed
 - [ ] Bookings: complete, no-show, cancel (weather flag)
@@ -58,7 +58,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Operator emails
 
 ## Phase 6 — Host portal
-- [ ] Apply form (`/for-hosts`) → pending application
+- [x] Apply form → pending application (done as `/signup?as=host`, with operators and optional guest accounts)
 - [ ] Dashboard stats
 - [ ] Picks: recommend, tip (≤200 chars), reorder, remove
 - [ ] Storefront settings + preview
@@ -68,7 +68,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Host emails
 
 ## Phase 7 — Admin
-- [ ] Approvals (hosts, operators, listings, listing edits)
+- [ ] Approvals (hosts, operators, listings, listing edits) — _hosts and operators done early on `/admin` (Verify / Reject); listings and listing edits still to do._
 - [ ] Create operator + experiences on behalf; send claim invite
 - [ ] Bookings search + manual status override + refunds
 - [ ] Hosts: verify, suspend, commission rate

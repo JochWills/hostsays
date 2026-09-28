@@ -11,6 +11,7 @@
   --green: #2d4a3e;
   --green-ink: #ffffff;
   --gold: #e3a33b;
+  --danger: #a4471f;
   --pill: rgba(20, 26, 22, 0.62);
   --hero: #2c1f11;
   --shadow: 0 1px 2px rgba(30, 39, 35, 0.06), 0 6px 18px rgba(30, 39, 35, 0.07);
@@ -28,6 +29,7 @@
     --line: #2c3531;
     --green: #5e9a82;
     --green-ink: #0c1511;
+    --danger: #e8906b;
     --pill: rgba(10, 14, 12, 0.7);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.35);
   }
@@ -42,6 +44,7 @@
   --line: #2c3531;
   --green: #5e9a82;
   --green-ink: #0c1511;
+  --danger: #e8906b;
   --pill: rgba(10, 14, 12, 0.7);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.35);
 }
@@ -53,6 +56,7 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
+  --color-danger: var(--danger);
   --color-green: var(--green);
   --color-green-ink: var(--green-ink);
   --color-gold: var(--gold);

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { btnPrimary } from "@/components/ui/styles";
 import { ProsePage } from "@/components/site/prose-page";
 import { HOST_COMMISSION_RATE, TIP_MAX_LENGTH } from "@/lib/config";
 import { formatPercent } from "@/lib/format";
@@ -53,7 +55,15 @@ export default function ForHostsPage() {
         hosts earn a commission.
       </p>
       <h2>Apply</h2>
-      <p>Host applications open soon.</p>
+      <p>
+        Sign up with your property details and a link to your Booking.com, Airbnb or own website listing. We check
+        every host, usually within two working days.
+      </p>
+      <p>
+        <Link href="/signup?as=host" className={`${btnPrimary} text-green-ink! no-underline!`}>
+          Join as a host
+        </Link>
+      </p>
     </ProsePage>
   );
 }

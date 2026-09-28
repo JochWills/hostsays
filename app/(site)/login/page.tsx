@@ -16,7 +16,8 @@ const ERRORS: Record<string, string> = {
   unconfirmed: "Please confirm your email address first. Check your inbox for the confirmation email.",
   rate: "Too many attempts. Please wait a minute and try again.",
   link: "That sign-in link has expired or was already used. Request a new one below.",
-  "no-account": "This email doesn't have a HostSays account yet.",
+  "no-account": "This email doesn't have a HostSays account yet. Sign up below.",
+  "confirm-elsewhere": "Your email is confirmed. Sign in below with the password you chose.",
 };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -34,8 +35,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <div className="w-full max-w-[420px]">
         <h1 className={pageTitle}>Sign in</h1>
         <p className="mt-2 text-[15px] text-muted">
-          For hosts, tourism operators and the HostSays team. Guests don&rsquo;t need an account: your booking link
-          is in your email.
+          For travellers, hosts and tourism operators. You don&rsquo;t need an account to book: your booking link
+          is always in your email.
         </p>
 
         {params["signed-out"] && !error && !sent && (
@@ -92,14 +93,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
         <p className="mt-6 text-[14px] text-muted">
           New to HostSays?{" "}
-          <Link href="/for-hosts" className="font-semibold text-green hover:underline">
-            Join as a host
-          </Link>{" "}
-          or{" "}
-          <Link href="/for-operators" className="font-semibold text-green hover:underline">
-            list your experience
+          <Link href="/signup" className="font-semibold text-green hover:underline">
+            Create an account
           </Link>
-          .
         </p>
       </div>
     </div>
