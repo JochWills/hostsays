@@ -12,8 +12,10 @@
 | `/x/[experience-slug]` | Experience page | Details, host recommendations, reviews, booking panel |
 | `/o/[operator-slug]` | Operator page | All of an operator's experiences |
 | `/how-it-works` | Guest explainer | Request → confirm → deposit → go |
-| `/hosts` | For hosts | Pitch + apply form |
-| `/operators` | For operators | Pitch + apply form |
+| `/hosts` | Hosts directory | All verified hosts, filter by area; cards link to storefronts |
+| `/areas` | Areas directory | All live areas; cards link to area pages |
+| `/for-hosts` | For hosts | Pitch + apply form |
+| `/for-operators` | For operators | Pitch + apply form |
 | `/about` | About | Story, trust, commission disclosure |
 | `/help` | FAQ | Guests, hosts, operators |
 | `/terms`, `/privacy`, `/cancellations`, `/operator-terms` | Legal | Placeholder content in development |
@@ -74,11 +76,11 @@ Areas and hosts share the top-level namespace.
 2. Else look up `hosts.slug` where `status = 'verified'`. If found → render host storefront **and set session attribution** (see `07-host-attribution.md`).
 3. Else 404.
 
-**Reserved slugs** (block for hosts and areas): `explore, x, o, b, host, hosts, operator, operators, admin, login, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml`.
+**Reserved slugs** (block for hosts and areas): `explore, x, o, b, host, hosts, areas, for-hosts, for-operators, operator, operators, admin, login, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml`.
 When a host picks a slug, also block any existing area slug and validate: lowercase letters, numbers and hyphens, 3–40 characters.
 
 ## Global UI
-- **Header** (on every public page): logo, nav (Experiences, Hosts, Areas, How it works, For Hosts), search icon, Sign in, "List your experience" button. On the homepage it sits transparent over the hero; elsewhere it's solid.
+- **Header** (on every public page): logo, nav (Experiences → `/explore`, Hosts → `/hosts`, Areas → `/areas`, How it works, For Hosts → `/for-hosts`), search icon, Sign in, "List your experience" button. On the homepage it sits transparent over the hero; elsewhere it's solid.
 - **"Staying at [Host]" pill** in the header when a host is remembered this session, with × to clear.
 - **Footer:** links, commission disclosure, legal links.
 

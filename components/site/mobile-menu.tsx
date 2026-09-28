@@ -51,7 +51,7 @@ export function MobileMenu() {
               Sign in
             </Link>
             <Link
-              href="/operators"
+              href="/for-operators"
               onClick={() => setOpen(false)}
               className="mt-2 rounded-[14px] bg-green px-[26px] py-[13px] text-center font-semibold text-green-ink"
             >

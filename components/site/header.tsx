@@ -37,7 +37,7 @@ export function Header({ variant = "solid", stayingAt = null }: Props) {
           Sign in
         </Link>
         <Link
-          href="/operators"
+          href="/for-operators"
           className={`hidden items-center gap-2.5 rounded-[14px] px-[26px] py-[13px] font-semibold whitespace-nowrap hover:brightness-110 sm:inline-flex ${
             overlay ? "border border-white/10 bg-[#2D4A3E] text-white" : "bg-green text-green-ink"
           }`}

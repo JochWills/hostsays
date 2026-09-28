@@ -24,7 +24,8 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] `/[area]/[category]` pages
 - [ ] `/x/[slug]` experience page (without booking submit yet)
 - [ ] `/o/[slug]` operator page
-- [ ] Static pages: how-it-works, hosts, operators, about, help, legal placeholders
+- [ ] `/hosts` and `/areas` directory pages
+- [ ] Static pages: how-it-works, for-hosts, for-operators, about, help, legal placeholders
 - [ ] SEO: metadata, sitemap, robots, JSON-LD, OG images
 
 ## Phase 3 — Host attribution
@@ -53,7 +54,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Operator emails
 
 ## Phase 6 — Host portal
-- [ ] Apply form (`/hosts`) → pending application
+- [ ] Apply form (`/for-hosts`) → pending application
 - [ ] Dashboard stats
 - [ ] Picks: recommend, tip (≤200 chars), reorder, remove
 - [ ] Storefront settings + preview
