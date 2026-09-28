@@ -419,8 +419,10 @@ enabled = true
 project_id = "dbcvagwmyofmlricojdb"
 
 [remotes.production.auth]
-site_url = "https://hostsays.onrender.com"
+site_url = "https://hostsays.com"
 additional_redirect_urls = [
+  "https://hostsays.com/auth/callback",
+  "https://www.hostsays.com/auth/callback",
   "https://hostsays.onrender.com/auth/callback",
   "http://localhost:3000/auth/callback",
 ]
