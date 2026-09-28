@@ -437,3 +437,4 @@ verify_enabled = true
 
 [remotes.production.storage.analytics]
 enabled = true
+max_namespaces = 10
