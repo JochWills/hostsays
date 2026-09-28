@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "HostSays",
     locale: "en_ZA",
     type: "website",
-    images: [{ url: "/images/hero.jpg", width: 1186, height: 603, alt: "Game drive at golden hour" }],
+    images: [{ url: "/images/hero.jpg", width: 2089, height: 753, alt: "Elephants at sunset seen from a game-drive vehicle" }],
   },
   robots: ALLOW_INDEXING ? { index: true, follow: true } : { index: false, follow: false },
 };
