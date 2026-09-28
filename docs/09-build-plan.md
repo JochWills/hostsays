@@ -44,7 +44,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Emails for all guest events (`08-emails.md`)
 
 ## Phase 5 — Operator portal
-- [ ] Auth (login, invites, roles), route protection
+- [ ] Auth (login, invites, roles), route protection — _started early: `/login` (password or emailed link), `/auth/callback`, sign-out, role guards and placeholder `/admin`, `/host`, `/operator` pages. Invites still to do._
 - [ ] Requests: accept/decline with countdown
 - [ ] Bookings: complete, no-show, cancel (weather flag)
 - [ ] Experiences CRUD with photo upload → submit for approval; live edits go to `pending_changes`
