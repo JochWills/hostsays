@@ -95,33 +95,33 @@ export default async function ExperiencePage({ params }: PageProps<"/x/[slug]">)
         <Link href={`/${e.area.slug}/${e.category}`} className="hover:text-green">{categoryLabel(e.category)}</Link>
       </nav>
 
-      {/* Gallery: first photo large */}
-      {cover && (
-        <div className={`grid gap-2 overflow-hidden rounded-[14px] ${rest.length ? "md:grid-cols-[2fr_1fr]" : ""}`}>
-          <div className={`relative bg-[#cfc6b6] ${rest.length ? "aspect-[16/10] md:aspect-auto md:min-h-[380px]" : "aspect-[16/10] md:aspect-[21/8]"}`}>
-            <Image
-              src={publicImageUrl("experience-photos", cover.path)}
-              alt={cover.alt}
-              fill
-              priority
-              sizes="(max-width: 980px) 100vw, 66vw"
-              className="object-cover"
-            />
-          </div>
-          {rest.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
-              {rest.slice(0, 2).map((p) => (
-                <div key={p.path} className="relative aspect-[16/10] bg-[#cfc6b6]">
-                  <Image src={publicImageUrl("experience-photos", p.path)} alt={p.alt} fill sizes="(max-width: 980px) 50vw, 33vw" className="object-cover" />
+      <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_380px]">
+        <div>
+          {/* Gallery: first photo large, in the left column so the booking panel sits beside it */}
+          {cover && (
+            <div className={`mb-6 grid gap-2 overflow-hidden rounded-[14px] ${rest.length ? "md:grid-cols-[2fr_1fr]" : ""}`}>
+              <div className={`relative bg-[#cfc6b6] ${rest.length ? "aspect-[16/10] md:aspect-auto md:min-h-[300px]" : "aspect-[16/10] md:aspect-[16/9]"}`}>
+                <Image
+                  src={publicImageUrl("experience-photos", cover.path)}
+                  alt={cover.alt}
+                  fill
+                  priority
+                  sizes="(max-width: 980px) 100vw, 60vw"
+                  className="object-cover"
+                />
+              </div>
+              {rest.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
+                  {rest.slice(0, 2).map((p) => (
+                    <div key={p.path} className="relative aspect-[16/10] bg-[#cfc6b6]">
+                      <Image src={publicImageUrl("experience-photos", p.path)} alt={p.alt} fill sizes="(max-width: 980px) 50vw, 20vw" className="object-cover" />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
-        </div>
-      )}
 
-      <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_380px]">
-        <div>
           <p className="mb-2 inline-flex items-center gap-2 text-[13px] font-semibold text-green">
             <CategoryIcon category={e.category} size={16} /> {categoryLabel(e.category)}
           </p>
