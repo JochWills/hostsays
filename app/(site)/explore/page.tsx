@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpDown, CalendarDays, ChevronDown, Compass, LayoutGrid, MapPin, Search, SlidersHorizontal, Tag, UsersRound } from "lucide-react";
+import { ArrowUpDown, CalendarDays, Compass, LayoutGrid, MapPin, Search, SlidersHorizontal, Tag, UsersRound } from "lucide-react";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { PriceRange } from "@/components/explore/price-range";
 import { CategoryIcon } from "@/components/icons/category-icon";
@@ -8,7 +8,9 @@ import { btnPrimary } from "@/components/ui/styles";
 import { CATEGORIES, categoryLabel, type Category } from "@/lib/categories";
 import { getProvinces, searchExperiences } from "@/lib/data/public";
 import { formatDate, formatPeople, formatRand, provinceInSentence } from "@/lib/format";
-import { minBookableDate } from "@/lib/dates";
+import { addDays, minBookableDate } from "@/lib/dates";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Dropdown } from "@/components/ui/dropdown";
 import { exploreParams, firstValues, PRICE_CAPS, PRICE_SLIDER_MAX, PRICE_STEP } from "@/lib/validation/explore";
 
 export const metadata: Metadata = {
@@ -241,88 +243,69 @@ type FilterProps = {
   q?: string;
 };
 
-/** One labelled filter in the bar: icon, small label, and a borderless control (with a ▾ for selects). */
-function Cell({ id, label, icon, select = true, children }: { id: string; label: string; icon: React.ReactNode; select?: boolean; children: React.ReactNode }) {
+/** One labelled filter in the bar: icon, small label, and a borderless control. */
+function Cell({ id, label, icon, children }: { id: string; label: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="flex min-w-0 items-center gap-3 rounded-[12px] border border-line px-3.5 py-2.5 min-[1360px]:rounded-none min-[1360px]:border-0 min-[1360px]:border-r min-[1360px]:px-5 min-[1360px]:py-1">
       <span aria-hidden="true" className="shrink-0 text-ink">
         {icon}
       </span>
-      <div className="relative min-w-0 flex-1">
-        <label htmlFor={id} className="block text-[12px] font-semibold text-muted">
+      <div className="min-w-0 flex-1">
+        <label id={`${id}-label`} htmlFor={id} className="block text-[12px] font-semibold text-muted">
           {label}
         </label>
         {children}
-        {select && (
-          <ChevronDown size={16} strokeWidth={2} aria-hidden="true" className="pointer-events-none absolute right-0 bottom-1.5 text-ink" />
-        )}
       </div>
     </div>
   );
 }
 
-const control =
-  "w-full min-w-0 cursor-pointer appearance-none truncate bg-transparent py-0.5 pr-5 text-[15px] font-medium text-ink focus:outline-none";
-
 function FilterBar({ idPrefix, provinces, areaSlug, category, date, people, min, max, sort, q }: FilterProps & { idPrefix: string }) {
   const icon = { size: 21, strokeWidth: 1.6 };
+  const ids = (key: string) => ({ id: `${idPrefix}-${key}`, labelledBy: `${idPrefix}-${key}-label`, name: key, variant: "bare" as const });
+  const areaOptions = [
+    { value: "", label: "Anywhere" },
+    ...provinces.flatMap((p) => [
+      { value: p.slug, label: `All of ${provinceInSentence(p.name)}`, group: p.name },
+      ...p.areas.map((a) => ({ value: a.slug, label: a.name, group: p.name })),
+    ]),
+  ];
+  const priceOptions = [
+    { value: "", label: "Any price" },
+    ...PRICE_CAPS.map((p) => ({ value: String(p), label: `Up to ${formatRand(p * 100)}` })),
+    ...(max && !PRICE_CAPS.includes(max) ? [{ value: String(max), label: `Up to ${formatRand(max * 100)}` }] : []),
+  ];
   return (
     <form action="/explore" className="grid gap-2.5 px-4 pb-4 md:grid-cols-4 md:items-center md:p-4 min-[1360px]:grid-cols-[1.1fr_1.1fr_1.1fr_0.8fr_0.95fr_1.55fr_auto] min-[1360px]:gap-0 min-[1360px]:p-3 min-[1360px]:pl-2">
       <Cell id={`${idPrefix}-area`} label="Area" icon={<MapPin {...icon} />}>
-        <select id={`${idPrefix}-area`} name="area" defaultValue={areaSlug ?? ""} className={control}>
-          <option value="">Anywhere</option>
-          {provinces.map((p) => (
-            <optgroup key={p.slug} label={p.name}>
-              <option value={p.slug}>All of {provinceInSentence(p.name)}</option>
-              {p.areas.map((a) => (
-                <option key={a.slug} value={a.slug}>
-                  {a.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        <Dropdown {...ids("area")} defaultValue={areaSlug ?? ""} options={areaOptions} />
       </Cell>
-      <Cell id={`${idPrefix}-cat`} label="Category" icon={<Compass {...icon} />}>
-        <select id={`${idPrefix}-cat`} name="category" defaultValue={category ?? ""} className={control}>
-          <option value="">All</option>
-          {CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
-            </option>
-          ))}
-        </select>
+      <Cell id={`${idPrefix}-category`} label="Category" icon={<Compass {...icon} />}>
+        <Dropdown {...ids("category")} defaultValue={category ?? ""} options={[{ value: "", label: "All" }, ...CATEGORIES.map((c) => ({ value: c.value, label: c.label }))]} />
       </Cell>
-      <Cell id={`${idPrefix}-date`} label="Date" icon={<CalendarDays {...icon} />} select={false}>
-        <input id={`${idPrefix}-date`} type="date" name="date" min={minBookableDate()} defaultValue={date} className={`${control} pr-0`} />
+      <Cell id={`${idPrefix}-date`} label="Date" icon={<CalendarDays {...icon} />}>
+        <DatePicker {...ids("date")} defaultValue={date ?? ""} minDate={minBookableDate()} maxDate={addDays(minBookableDate(), 365)} />
       </Cell>
       <Cell id={`${idPrefix}-people`} label="People" icon={<UsersRound {...icon} />}>
-        <select id={`${idPrefix}-people`} name="people" defaultValue={people?.toString() ?? ""} className={control}>
-          <option value="">Any</option>
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
-            <option key={n} value={n}>
-              {formatPeople(n)}
-            </option>
-          ))}
-        </select>
+        <Dropdown
+          {...ids("people")}
+          defaultValue={people?.toString() ?? ""}
+          options={[{ value: "", label: "Any" }, ...Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: formatPeople(i + 1) }))]}
+        />
       </Cell>
       <Cell id={`${idPrefix}-max`} label="Price" icon={<Tag {...icon} />}>
-        <select id={`${idPrefix}-max`} name="max" defaultValue={max?.toString() ?? ""} className={control}>
-          <option value="">Any price</option>
-          {PRICE_CAPS.map((p) => (
-            <option key={p} value={p}>
-              Up to {formatRand(p * 100)}
-            </option>
-          ))}
-          {max && !PRICE_CAPS.includes(max) && <option value={max}>Up to {formatRand(max * 100)}</option>}
-        </select>
+        <Dropdown {...ids("max")} defaultValue={max?.toString() ?? ""} options={priceOptions} />
       </Cell>
       <Cell id={`${idPrefix}-sort`} label="Sort by" icon={<ArrowUpDown {...icon} />}>
-        <select id={`${idPrefix}-sort`} name="sort" defaultValue={sort ?? "recommended"} className={control}>
-          <option value="recommended">Most recommended</option>
-          <option value="price-asc">Price: low to high</option>
-          <option value="price-desc">Price: high to low</option>
-        </select>
+        <Dropdown
+          {...ids("sort")}
+          defaultValue={sort ?? "recommended"}
+          options={[
+            { value: "recommended", label: "Most recommended" },
+            { value: "price-asc", label: "Price: low to high" },
+            { value: "price-desc", label: "Price: high to low" },
+          ]}
+        />
       </Cell>
       {q && <input type="hidden" name="q" value={q} />}
       {min && <input type="hidden" name="min" value={min} />}

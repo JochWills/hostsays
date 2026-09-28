@@ -7,7 +7,7 @@ import { requireOperator } from "@/lib/portal";
 import { getExperienceForEdit } from "@/lib/data/portal";
 import { getAllAreas } from "@/lib/data/public";
 import { formatDate, formatTime } from "@/lib/format";
-import { WEEKDAYS, WEEKDAY_ORDER, minBookableDate } from "@/lib/dates";
+import { WEEKDAYS, WEEKDAY_ORDER, addDays, minBookableDate } from "@/lib/dates";
 import { publicImageUrl } from "@/lib/storage";
 import { firstValues } from "@/lib/validation/explore";
 import {
@@ -23,7 +23,7 @@ import {
   uploadPhoto,
 } from "../../actions";
 import { ExperienceForm } from "@/components/portal/experience-form";
-import { ActionForm, ConfirmButton, FileField, Row, TextField, WeekdayPicker } from "@/components/portal/form";
+import { ActionForm, ConfirmButton, DateField, FileField, Row, TextField, TimeField, WeekdayPicker } from "@/components/portal/form";
 import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
 import { btnPrimary, btnSecondary, panel, sectionTitle } from "@/components/ui/styles";
 
@@ -173,7 +173,7 @@ export default async function EditExperience({ params, searchParams }: PageProps
         <ActionForm action={addSlots.bind(null, exp.id)} submitLabel="Add time">
           <WeekdayPicker name="weekdays" label="Days" />
           <Row>
-            <TextField name="startTime" label="Start time" type="time" defaultValue="09:00" />
+            <TimeField name="startTime" label="Start time" defaultValue="09:00" />
             <TextField name="capacity" label="People per time" inputMode="numeric" defaultValue={exp.max_people} />
           </Row>
         </ActionForm>
@@ -204,7 +204,7 @@ export default async function EditExperience({ params, searchParams }: PageProps
         )}
         <ActionForm action={addBlackout.bind(null, exp.id)} submitLabel="Close this date">
           <Row>
-            <TextField name="date" label="Date" type="date" defaultValue={minBookableDate()} />
+            <DateField name="date" label="Date" minDate={minBookableDate()} maxDate={addDays(minBookableDate(), 730)} defaultValue={minBookableDate()} />
             <TextField name="reason" label="Note (optional, only you see it)" placeholder="e.g. Public holiday" />
           </Row>
         </ActionForm>

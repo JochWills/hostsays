@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signUp, type SignupState } from "./actions";
 import { HOST_TYPES, type AccountType } from "@/lib/validation/auth";
 import { btnPrimary, input, label, panel } from "@/components/ui/styles";
+import { Dropdown } from "@/components/ui/dropdown";
 
 type Props = { type: AccountType; areas: { id: string; name: string; province: string }[] };
 
@@ -52,7 +53,7 @@ export function SignupForm({ type, areas }: Props) {
 
   const field = (name: string, text: string, el: React.ReactNode, hint?: string) => (
     <div>
-      <label htmlFor={name} className={label}>
+      <label id={`${name}-label`} htmlFor={name} className={label}>
         {text}
       </label>
       {el}
@@ -71,22 +72,17 @@ export function SignupForm({ type, areas }: Props) {
   const areaSelect = field(
     "areaId",
     "Area",
-    <select id="areaId" name="areaId" required defaultValue={values.areaId ?? ""} className={input} {...a11y("areaId")}>
-      <option value="" disabled>
-        Choose your area
-      </option>
-      {[...new Set(areas.map((a) => a.province))].map((province) => (
-        <optgroup key={province} label={province}>
-          {areas
-            .filter((a) => a.province === province)
-            .map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-        </optgroup>
-      ))}
-    </select>,
+    <Dropdown
+      key={values.areaId}
+      id="areaId"
+      name="areaId"
+      labelledBy="areaId-label"
+      placeholder="Choose your area"
+      defaultValue={values.areaId ?? ""}
+      options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))}
+      invalid={Boolean(errors.areaId)}
+      describedBy={errors.areaId ? "areaId-error" : undefined}
+    />,
   );
   const phoneField = field(
     "phone",
@@ -141,23 +137,17 @@ export function SignupForm({ type, areas }: Props) {
           {field(
             "hostType",
             "Type of place",
-            <select
+            <Dropdown
+              key={values.hostType}
               id="hostType"
               name="hostType"
-              required
+              labelledBy="hostType-label"
+              placeholder="Choose one"
               defaultValue={values.hostType ?? ""}
-              className={input}
-              {...a11y("hostType")}
-            >
-              <option value="" disabled>
-                Choose one
-              </option>
-              {HOST_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>,
+              options={HOST_TYPES}
+              invalid={Boolean(errors.hostType)}
+              describedBy={errors.hostType ? "hostType-error" : undefined}
+            />,
           )}
           {areaSelect}
           {field(

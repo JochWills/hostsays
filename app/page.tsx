@@ -8,6 +8,7 @@ import { HowSteps } from "@/components/home/how-steps";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { HostGrid } from "@/components/cards/host-card";
 import { SectionHead } from "@/components/ui/section-head";
+import { provinceInSentence } from "@/lib/format";
 import { getFeaturedExperiences, getHostCards, getLiveAreas, getProvinces } from "@/lib/data/public";
 import { minBookableDate } from "@/lib/dates";
 
@@ -21,8 +22,14 @@ export default async function Home() {
     getLiveAreas(),
     getProvinces(),
   ]);
-  // Search suggestions: live towns first, then provinces.
-  const places = [...areas, ...provinces].map((a) => ({ slug: a.slug, name: a.name }));
+  // "Where are you going?": anywhere, then each province with its live towns.
+  const places = [
+    { value: "", label: "Anywhere" },
+    ...provinces.flatMap((p) => [
+      { value: p.slug, label: `All of ${provinceInSentence(p.name)}`, group: p.name },
+      ...p.areas.map((a) => ({ value: a.slug, label: a.name, group: p.name })),
+    ]),
+  ];
 
   return (
     <>
@@ -44,7 +51,7 @@ export default async function Home() {
               guesthouses and hosts you stay with.
             </p>
           </div>
-          <HeroSearch areas={places} minDate={minBookableDate()} />
+          <HeroSearch places={places} minDate={minBookableDate()} />
           <div className="mt-[22px] pb-[26px] sm:pb-8">
             <CategoryChips onPhoto />
           </div>

@@ -3,6 +3,8 @@
 import { createContext, useActionState, useContext, useEffect, useRef } from "react";
 import type { FormAction, FormState } from "@/lib/form-state";
 import { btnPrimary, input, label as labelClass } from "@/components/ui/styles";
+import { Dropdown } from "@/components/ui/dropdown";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const Ctx = createContext<FormState>({});
 
@@ -70,7 +72,7 @@ function useField(name: string, defaultValue?: string | number | null) {
 function Wrap({ name, label, hint, error, children }: { name: string; label: string; hint?: React.ReactNode; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={name} className={labelClass}>
+      <label id={`${name}-label`} htmlFor={name} className={labelClass}>
         {label}
       </label>
       {children}
@@ -155,34 +157,56 @@ export function SelectField({
   ...p
 }: Common & { options: readonly { value: string; label: string; group?: string }[]; placeholder?: string }) {
   const f = useField(p.name, p.defaultValue);
-  // Options with a `group` (e.g. towns by province) are shown under <optgroup> headings, in order.
-  const groups = [...new Set(options.map((o) => o.group))];
-  const render = (list: readonly { value: string; label: string }[]) =>
-    list.map((o) => (
-      <option key={o.value} value={o.value}>
-        {o.label}
-      </option>
-    ));
   return (
     <Wrap name={p.name} label={p.label} hint={p.hint} error={f.error}>
-      <select id={p.name} name={p.name} required={p.required} defaultValue={f.value} className={input} {...f.a11y}>
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
-        )}
-        {groups.map((g) =>
-          g ? (
-            <optgroup key={g} label={g}>
-              {render(options.filter((o) => o.group === g))}
-            </optgroup>
-          ) : (
-            render(options.filter((o) => !o.group))
-          ),
-        )}
-      </select>
+      {/* key: start again from the refilled value after the form is submitted */}
+      <Dropdown
+        key={f.value}
+        id={p.name}
+        name={p.name}
+        labelledBy={`${p.name}-label`}
+        options={options}
+        defaultValue={f.value}
+        placeholder={placeholder}
+        invalid={Boolean(f.error)}
+        describedBy={f.error ? `${p.name}-error` : undefined}
+      />
     </Wrap>
   );
+}
+
+/** Date field with our calendar (YYYY-MM-DD). */
+export function DateField({ minDate, maxDate, placeholder = "Choose a date", ...p }: Common & { minDate: string; maxDate: string; placeholder?: string }) {
+  const f = useField(p.name, p.defaultValue);
+  return (
+    <Wrap name={p.name} label={p.label} hint={p.hint} error={f.error}>
+      <DatePicker
+        key={f.value}
+        id={p.name}
+        name={p.name}
+        labelledBy={`${p.name}-label`}
+        defaultValue={f.value}
+        minDate={minDate}
+        maxDate={maxDate}
+        placeholder={placeholder}
+        clearable={false}
+        invalid={Boolean(f.error)}
+        describedBy={f.error ? `${p.name}-error` : undefined}
+      />
+    </Wrap>
+  );
+}
+
+/** Time of day in 15-minute steps (HH:MM), e.g. a slot's start time. */
+export function TimeField({ from = 5, to = 21, ...p }: Common & { from?: number; to?: number }) {
+  const options = [];
+  for (let h = from; h <= to; h++) {
+    for (const m of [0, 15, 30, 45]) {
+      const t = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      options.push({ value: t, label: t });
+    }
+  }
+  return <SelectField {...p} options={options} placeholder="Choose a time" />;
 }
 
 export function CheckboxField({ name, label, defaultChecked }: { name: string; label: React.ReactNode; defaultChecked?: boolean }) {

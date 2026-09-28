@@ -6,7 +6,8 @@ import { computeBookingAmounts } from "@/lib/bookings/pricing";
 import { DEPOSIT_RATE } from "@/lib/config";
 import { formatDate, formatPercent, formatRand, formatTime } from "@/lib/format";
 import { requestNote } from "@/lib/policy";
-import { btnPrimary, input, label } from "@/components/ui/styles";
+import { btnPrimary, label } from "@/components/ui/styles";
+import { Dropdown } from "@/components/ui/dropdown";
 import { useStayingHost } from "@/components/site/staying-pill";
 import { AvailabilityCalendar } from "./availability-calendar";
 
@@ -53,7 +54,10 @@ export function BookingPanel({
   const staying = useStayingHost();
   const rememberedSlug = staying && hosts.some((h) => h.slug === staying.slug) ? staying.slug : "";
   const hostValue = hostChoice || rememberedSlug;
-  const areas = useMemo(() => [...new Set(hosts.map((h) => h.area))], [hosts]);
+  const hostOptions = useMemo(
+    () => [...hosts.map((h) => ({ value: h.slug, label: h.name, group: h.area })), { value: NO_HOST, label: "Somewhere else / not listed" }],
+    [hosts],
+  );
 
   const openWeekdays = useMemo(() => [...new Set(slots.map((s) => s.weekday))], [slots]);
   const times = date
@@ -140,26 +144,18 @@ export function BookingPanel({
       </div>
 
       <div className="mt-4">
-        <label htmlFor="staying" className={label}>
+        <label id="staying-label" htmlFor="staying" className={label}>
           Where are you staying?
         </label>
-        <select id="staying" name="host" value={hostValue} onChange={(e) => setHostChoice(e.target.value)} className={input}>
-          <option value="" disabled>
-            Choose your accommodation
-          </option>
-          {areas.map((area) => (
-            <optgroup key={area} label={area}>
-              {hosts
-                .filter((h) => h.area === area)
-                .map((h) => (
-                  <option key={h.slug} value={h.slug}>
-                    {h.name}
-                  </option>
-                ))}
-            </optgroup>
-          ))}
-          <option value={NO_HOST}>Somewhere else / not listed</option>
-        </select>
+        <Dropdown
+          id="staying"
+          name="host"
+          labelledBy="staying-label"
+          value={hostValue}
+          onChange={setHostChoice}
+          options={hostOptions}
+          placeholder="Choose your accommodation"
+        />
         <p className="mt-1.5 text-[12.5px] text-muted">
           {hostValue && hostValue !== NO_HOST
             ? "Your host earns a small commission when you book. It doesn't change your price."
