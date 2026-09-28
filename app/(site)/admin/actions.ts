@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -39,14 +40,25 @@ export async function setAccountStatus(form: FormData) {
 
 const listingDecision = z.object({ id: z.uuid(), status: z.enum(["live", "rejected", "paused"]) });
 
-/** Approve (live), send back (rejected) or pause a listing. Approving only works on listings in review or paused. */
+/**
+ * Approve (live), send back (rejected) or pause a listing. Admins may approve a draft or sent-back listing
+ * directly, but only once it has at least one photo and one weekly time.
+ */
 export async function setListingStatus(form: FormData) {
   await requireRole("admin", "/admin");
   const parsed = listingDecision.safeParse({ id: form.get("id"), status: form.get("status") });
   if (!parsed.success) return;
   const { id, status } = parsed.data;
-  const from: Enum<"listing_status">[] = status === "live" ? ["pending_review", "paused"] : status === "rejected" ? ["pending_review"] : ["live"];
+  const from: Enum<"listing_status">[] =
+    status === "live" ? ["pending_review", "paused", "draft", "rejected"] : status === "rejected" ? ["pending_review"] : ["live"];
   const db = createAdminClient();
+  if (status === "live") {
+    const [{ count: photos }, { count: slots }] = await Promise.all([
+      db.from("experience_photos").select("id", { count: "exact", head: true }).eq("experience_id", id),
+      db.from("experience_slots").select("id", { count: "exact", head: true }).eq("experience_id", id),
+    ]);
+    if (!photos || !slots) redirect(`/admin/experiences/${id}?error=incomplete`);
+  }
   const { error } = await db.from("experiences").update({ status }).eq("id", id).in("status", from);
   if (error) throw new Error(`Couldn't update listing: ${error.message}`);
   revalidatePath("/admin", "layout");

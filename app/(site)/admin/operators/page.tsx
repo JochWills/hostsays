@@ -4,7 +4,9 @@ import { requireRole } from "@/lib/auth";
 import { getAllOperatorsForAdmin } from "@/lib/data/portal";
 import { AccountActions } from "@/components/portal/admin-buttons";
 import { PageHeading, StatusPill } from "@/components/portal/ui";
-import { panel } from "@/components/ui/styles";
+import { btnSecondary, panel } from "@/components/ui/styles";
+
+const small = "!px-3.5 !py-2 !text-[13.5px]";
 
 export const metadata: Metadata = { title: "Operators", robots: { index: false, follow: false } };
 
@@ -19,13 +21,9 @@ export default async function AdminOperators() {
           <li key={o.id} className={`${panel} flex flex-wrap items-center gap-x-4 gap-y-3`}>
             <div className="min-w-0 flex-1 basis-[260px]">
               <p className="font-bold">
-                {o.status === "verified" ? (
-                  <Link href={`/o/${o.slug}`} className="hover:underline">
-                    {o.name}
-                  </Link>
-                ) : (
-                  o.name
-                )}
+                <Link href={`/admin/operators/${o.id}`} className="hover:underline">
+                  {o.name}
+                </Link>
                 {o.is_demo && <span className="ml-2 rounded-full bg-panel px-2 py-0.5 text-[12px] font-semibold text-muted">Demo</span>}
               </p>
               <p className="text-[14px] break-words text-muted">
@@ -34,6 +32,9 @@ export default async function AdminOperators() {
               </p>
             </div>
             <StatusPill status={o.status} />
+            <Link href={`/admin/operators/${o.id}`} className={`${btnSecondary} ${small}`}>
+              Edit
+            </Link>
             <AccountActions kind="operator" id={o.id} name={o.name} status={o.status} />
           </li>
         ))}

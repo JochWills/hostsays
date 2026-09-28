@@ -100,6 +100,27 @@ export const bankInput = z.object({
   branchCode: z.string().trim().regex(/^\d{4,8}$/, "Enter the branch code (digits only)"),
 });
 
+// ---------- Admin (extra fields only the HostSays team can change) ----------
+const checkbox = z.literal("on").optional().transform((v) => v === "on");
+
+export const adminHostDetails = hostDetails.extend({
+  listingUrl: webAddress.refine((v) => v !== "", "Add the link to their listing"),
+  /** "6" or "6,5" (percent) → 0.06 / 0.065. The database allows 0–10%. */
+  commissionPercent: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(",", ".").replace(/%$/, ""))
+    .pipe(z.string().regex(/^\d{1,2}(\.\d{1,2})?$/, "Enter a percentage from 0 to 10, e.g. 6"))
+    .transform(Number)
+    .pipe(z.number().min(0, "Enter a percentage from 0 to 10").max(10, "Enter a percentage from 0 to 10"))
+    .transform((pct) => Math.round(pct * 100) / 10000),
+  /** Position in the homepage "Hosts who know the area" row; blank = not featured. */
+  featuredRank: z.union([z.literal("").transform(() => null), int(1, 99, "Enter a position from 1, or leave it blank")]),
+  welcomeNote: optionalText(600, "Keep the welcome note under 600 characters"),
+});
+
+export const adminOperatorDetails = operatorDetails.extend({ isDemo: checkbox });
+
 export const tipInput = z.object({
   tip: text(1, TIP_MAX_LENGTH, `Write a short tip (up to ${TIP_MAX_LENGTH} characters)`),
 });

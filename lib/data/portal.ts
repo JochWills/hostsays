@@ -74,12 +74,17 @@ export async function getOperatorExperiences(operatorId: string): Promise<Operat
   }));
 }
 
-/** One of the signed-in operator's experiences, with photos, weekly times and closed dates. RLS keeps it to their own. */
-export async function getExperienceForEdit(id: string) {
-  const db = await createClient();
+/**
+ * An experience with photos, weekly times and closed dates. As the signed-in operator, RLS keeps it to their own;
+ * `asAdmin` reads any (callers must check the admin role first).
+ */
+export async function getExperienceForEdit(id: string, { asAdmin = false } = {}) {
+  const db = asAdmin ? createAdminClient() : await createClient();
   const { data, error } = await db
     .from("experiences")
-    .select("*, experience_photos(id, path, alt, sort_order), experience_slots(id, weekday, start_time, capacity), experience_blackouts(date, reason)")
+    .select(
+      "*, operators(id, name, slug, status), experience_photos(id, path, alt, sort_order), experience_slots(id, weekday, start_time, capacity), experience_blackouts(date, reason)",
+    )
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`experience: ${error.message}`);
@@ -293,4 +298,60 @@ export async function getAllExperiencesForAdmin() {
     .order("updated_at", { ascending: false });
   if (error) throw new Error(`experiences: ${error.message}`);
   return data;
+}
+
+/** Everything about one host, for the admin edit page. Callers must check the admin role first. */
+export async function getHostForAdmin(id: string) {
+  const db = createAdminClient();
+  const [{ data: host, error }, { data: picks, error: picksError }] = await Promise.all([
+    db
+      .from("hosts")
+      .select(
+        "*, host_private(listing_url, contact_email, contact_phone, commission_rate), host_bank_details(account_name, bank_name, account_number, branch_code, confirmed, updated_at), host_members(user_id, is_owner, profiles(full_name, phone))",
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    db
+      .from("recommendations")
+      .select("id, tip, is_hidden, sort_order, experiences(id, slug, title, status)")
+      .eq("host_id", id)
+      .order("sort_order")
+      .order("created_at"),
+  ]);
+  if (error) throw new Error(`host: ${error.message}`);
+  if (picksError) throw new Error(`picks: ${picksError.message}`);
+  return host ? { ...host, picks: picks ?? [] } : null;
+}
+
+/** Everything about one operator, for the admin edit page. Callers must check the admin role first. */
+export async function getOperatorForAdmin(id: string) {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("operators")
+    .select(
+      "*, operator_private(contact_email, contact_phone, terms_accepted_at), operator_members(user_id, is_owner, profiles(full_name, phone)), experiences(id, title, status, price_cents, is_group_price, updated_at)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`operator: ${error.message}`);
+  return data ? { ...data, experiences: [...data.experiences].sort((a, b) => b.updated_at.localeCompare(a.updated_at)) } : null;
+}
+
+export type MemberLogin = { userId: string; isOwner: boolean; name: string | null; phone: string | null; email: string | null };
+
+/** The people who sign in for a host or operator, with their login emails. Callers must check the admin role first. */
+export async function getMemberLogins(
+  members: { user_id: string; is_owner: boolean; profiles: { full_name: string | null; phone: string | null } | null }[],
+): Promise<MemberLogin[]> {
+  const db = createAdminClient();
+  const users = await Promise.all(members.map((m) => db.auth.admin.getUserById(m.user_id)));
+  return members
+    .map((m, i) => ({
+      userId: m.user_id,
+      isOwner: m.is_owner,
+      name: m.profiles?.full_name ?? null,
+      phone: m.profiles?.phone ?? null,
+      email: users[i].data.user?.email ?? null,
+    }))
+    .sort((a, b) => Number(b.isOwner) - Number(a.isOwner));
 }

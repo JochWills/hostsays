@@ -74,8 +74,12 @@ Every portal also has a settings page with **Your details** (name, phone) and **
 | `/admin/approvals` | Host applications, operator applications, listing submissions/edits |
 | `/admin/bookings` | Search all bookings, override status, trigger refunds |
 | `/admin/operators` | List; **create operator on behalf**; send claim invite |
-| `/admin/experiences` | Create/edit any experience |
-| `/admin/hosts` | List, verify, suspend, set commission rate |
+| `/admin/operators/[id]` | Edit any operator (details, contact, demo flag), see who signs in, list their experiences |
+| `/admin/operators/[id]/new` | Create an experience on the operator's behalf (starts as a draft) |
+| `/admin/experiences` | List by status |
+| `/admin/experiences/[id]` | Edit any experience at any status: details, photos, weekly times, closed dates; approve, send back, pause, delete drafts |
+| `/admin/hosts` | List, verify, suspend |
+| `/admin/hosts/[id]` | Edit any host: details, listing link, contact, commission rate, homepage position, welcome note, photo, bank details, picks (edit tip, hide, delete) |
 | `/admin/recommendations` | Moderate recommendations and tips |
 | `/admin/payouts` | Monthly payout run, CSV export, mark paid |
 | `/admin/content` | Areas, categories, homepage featured items |

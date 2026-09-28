@@ -30,11 +30,14 @@ export function ExperienceForm({
   action,
   areas,
   experience,
+  defaultAreaId,
   submitLabel,
 }: {
   action: FormAction;
   areas: { id: string; name: string; province: string }[];
   experience?: ExperienceValues;
+  /** For a new experience: start with this area picked. */
+  defaultAreaId?: string;
   submitLabel: string;
 }) {
   const e = experience;
@@ -56,7 +59,7 @@ export function ExperienceForm({
           label="Area"
           placeholder="Choose the area"
           options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))}
-          defaultValue={e?.area_id}
+          defaultValue={e?.area_id ?? defaultAreaId}
         />
       </Row>
       <TextField name="summary" label="One-line summary" defaultValue={e?.summary} hint="Shown on cards. 10–160 characters." />

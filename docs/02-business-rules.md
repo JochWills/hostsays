@@ -111,6 +111,7 @@ No sync is perfect, so request-to-book and "Offer another time" stay as the safe
 
 ## Operators and listings
 - Operators create their own listings; **admin approves** before they go live. Edits to live listings also need approval (except availability changes).
+- **Admin can edit any host, operator or listing directly, at any status.** Admin edits to live listings show straight away (no approval step). Login emails and passwords stay with the account holder.
 - **Admin can create an operator and its listings on the operator's behalf.** The operator can later claim the account by email invite and take over editing.
 - Operators sign up to the commission terms (checkbox + timestamp) before going live.
 

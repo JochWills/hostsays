@@ -6,7 +6,7 @@ import { formatRand } from "@/lib/format";
 import { firstValues } from "@/lib/validation/explore";
 import { ListingActions } from "@/components/portal/admin-buttons";
 import { PageHeading, StatusPill } from "@/components/portal/ui";
-import { panel } from "@/components/ui/styles";
+import { btnSecondary, panel } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Experiences", robots: { index: false, follow: false } };
 
@@ -52,6 +52,9 @@ export default async function AdminExperiences({ searchParams }: PageProps<"/adm
               </p>
             </div>
             <StatusPill status={e.status} />
+            <Link href={`/admin/experiences/${e.id}`} className={`${btnSecondary} !px-3.5 !py-2 !text-[13.5px]`}>
+              Edit
+            </Link>
             <ListingActions id={e.id} title={e.title} status={e.status} />
           </li>
         ))}

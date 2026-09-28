@@ -60,6 +60,8 @@ export function ListingActions({ id, title, status }: { id: string; title: strin
           {button("rejected", "Send back", false, `Send "${title}" back to the operator for changes? Email them what to fix.`)}
         </>
       )}
+      {(status === "draft" || status === "rejected") &&
+        button("live", "Approve and put live", true, `Put "${title}" live now? It hasn't been submitted for review.`)}
       {status === "live" && button("paused", "Pause", false, `Take "${title}" off the site?`)}
       {status === "paused" && button("live", "Put live again")}
     </div>

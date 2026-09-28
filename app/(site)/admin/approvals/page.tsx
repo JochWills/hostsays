@@ -52,7 +52,7 @@ export default async function AdminApprovals() {
               </dl>
               <p className="mt-3 text-[14px]">
                 <Link href={`/admin/experiences/${l.id}`} className={link}>
-                  Read the full listing
+                  Read or edit the full listing
                 </Link>
               </p>
               <div className="mt-3">
@@ -70,7 +70,10 @@ export default async function AdminApprovals() {
           {hosts.map((h) => (
             <li key={h.id} className={panel}>
               <p className="font-bold">
-                {h.name} <span className="font-normal text-muted">· {hostTypeLabel(h.type)}</span>
+                <Link href={`/admin/hosts/${h.id}`} className="hover:underline">
+                  {h.name}
+                </Link>{" "}
+                <span className="font-normal text-muted">· {hostTypeLabel(h.type)}</span>
               </p>
               <dl className="mt-2 space-y-1">
                 <Detail label="Area">{h.area ?? "—"}</Detail>
@@ -88,6 +91,11 @@ export default async function AdminApprovals() {
               <div className="mt-3">
                 <AccountActions kind="host" id={h.id} name={h.name} status="pending" />
               </div>
+              <p className="mt-2 text-[14px]">
+                <Link href={`/admin/hosts/${h.id}`} className={link}>
+                  Edit their details
+                </Link>
+              </p>
             </li>
           ))}
         </ul>
@@ -99,7 +107,11 @@ export default async function AdminApprovals() {
         <ul className="mt-3 space-y-3">
           {operators.map((o) => (
             <li key={o.id} className={panel}>
-              <p className="font-bold">{o.name}</p>
+              <p className="font-bold">
+                <Link href={`/admin/operators/${o.id}`} className="hover:underline">
+                  {o.name}
+                </Link>
+              </p>
               <dl className="mt-2 space-y-1">
                 <Detail label="Area">{o.area ?? "—"}</Detail>
                 <Detail label="Website">
@@ -120,6 +132,11 @@ export default async function AdminApprovals() {
               <div className="mt-3">
                 <AccountActions kind="operator" id={o.id} name={o.name} status="pending" />
               </div>
+              <p className="mt-2 text-[14px]">
+                <Link href={`/admin/operators/${o.id}`} className={link}>
+                  Edit their details
+                </Link>
+              </p>
             </li>
           ))}
         </ul>

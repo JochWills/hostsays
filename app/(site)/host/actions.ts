@@ -1,8 +1,8 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { replaceHostPhoto } from "@/lib/host-edit";
 import { requireHost } from "@/lib/portal";
 import { createClient } from "@/lib/supabase/server";
 import { formValues, invalid, type FormState } from "@/lib/form-state";
@@ -92,33 +92,11 @@ export async function saveWelcomeNote(_prev: FormState, form: FormData): Promise
   return { ok: "Saved" };
 }
 
-const PHOTO_TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
-
 export async function uploadHostPhoto(_prev: FormState, form: FormData): Promise<FormState> {
   const { host } = await requireHost();
-  const file = form.get("photo");
-  if (!(file instanceof File) || file.size === 0) return { errors: { photo: "Choose a photo to upload" } };
-  const ext = PHOTO_TYPES[file.type];
-  if (!ext) return { errors: { photo: "Use a JPG, PNG or WebP photo" } };
-  if (file.size > 5 * 1024 * 1024) return { errors: { photo: "Photos must be 5 MB or smaller" } };
-
-  const db = await createClient();
-  const { data: current } = await db.from("hosts").select("photo_path").eq("id", host.id).single();
-  const path = `${host.id}/${randomUUID()}.${ext}`;
-  const upload = await db.storage.from("host-photos").upload(path, file, { contentType: file.type });
-  if (upload.error) {
-    console.error("host photo upload failed", upload.error.message);
-    return { error: "Couldn't upload the photo. Please try again." };
-  }
-  const { error } = await db.from("hosts").update({ photo_path: path }).eq("id", host.id);
-  if (error) {
-    await db.storage.from("host-photos").remove([path]);
-    return SAVE_FAILED;
-  }
-  // Remove the previous photo (always under this host's folder).
-  if (current?.photo_path?.startsWith(`${host.id}/`)) await db.storage.from("host-photos").remove([current.photo_path]);
-  await refresh();
-  return { ok: "Photo updated" };
+  const result = await replaceHostPhoto(await createClient(), host.id, form);
+  if (result.ok) await refresh();
+  return result;
 }
 
 // ---------- Picks (recommendations) ----------
