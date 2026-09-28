@@ -74,7 +74,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 
 ## Phase 8 — Scheduled jobs
 - [ ] All cron jobs in `06-booking-flow.md`, protected with `CRON_SECRET`, idempotent
-- [ ] Vercel cron config
+- [ ] Render Cron Job in `render.yaml` (every 15 min, calls `/api/cron/*` with `CRON_SECRET`; share the secret with the web service)
 
 ## Phase 9 — Reviews
 - [ ] Review form from completed bookings

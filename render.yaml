@@ -1,0 +1,44 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Values marked `sync: false` are secrets: Render asks for them when the Blueprint is first applied,
+# and you manage them in the dashboard afterwards. Never put secret values in this file.
+services:
+  - type: web
+    name: hostsays
+    runtime: node
+    region: frankfurt # closest Render region to the Supabase project (eu-west-1, Ireland)
+    plan: starter # paid, so the site never sleeps (guests and Paystack webhooks need it awake)
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false # the onrender.com URL at first, then https://hostsays.com
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: "HostSays <bookings@hostsays.com>"
+      - key: EMAIL_REPLY_TO
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: CRON_SECRET
+        generateValue: true
+
+  # Phase 8 adds the scheduled jobs here: a `type: cron` service on "*/15 * * * *" that calls
+  # /api/cron/* with CRON_SECRET (use `fromService` to share the web service's value).

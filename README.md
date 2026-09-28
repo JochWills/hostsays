@@ -13,7 +13,7 @@ HostSays is a booking platform for tourism experiences on the Eastern Cape coast
 - A Supabase project (URL, anon key, service-role key)
 - A Paystack account (test keys first)
 - A Resend account and a verified sending domain (hostsays.com)
-- A Vercel account
+- A Render account (paid instance, so the site never sleeps)
 - The domains hostsays.com and hostsays.co.za
 
 Copy `.env.example` to `.env.local` and fill in the values.

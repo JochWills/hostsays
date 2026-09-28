@@ -20,7 +20,7 @@ You are building **HostSays** (hostsays.com): a marketplace where travellers dis
 - **Paystack**: 10% booking deposits, refunds, webhooks (ZAR)
 - **Resend** + React Email for transactional emails
 - **Tailwind CSS** with the CSS variables from `docs/04-design-system.md`
-- **Vercel** for hosting, Vercel Cron for scheduled jobs
+- **Render** for hosting (Web Service, Frankfurt, `render.yaml`), a Render Cron Job for scheduled jobs
 - **Zod** for validating every form and API input
 
 ## Reference material

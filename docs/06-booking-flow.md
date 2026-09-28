@@ -65,7 +65,9 @@ Rate-limit requests per IP/email to prevent spam.
 - `no_show` → commission `payable`, no review request.
 - If the operator doesn't mark it within 3 days after the date, send a reminder; after 7 days, auto-complete (flag for admin).
 
-## Scheduled jobs (Vercel Cron → `/api/cron/*`, protected by `CRON_SECRET`)
+## Scheduled jobs (Render Cron Job → `/api/cron/*`, protected by `CRON_SECRET`)
+One Render Cron Job runs every 15 minutes and calls the app's cron endpoints with `Authorization: Bearer $CRON_SECRET`. Daily and monthly jobs check the time (Africa/Johannesburg) themselves and must be idempotent, so a missed or repeated run is harmless.
+
 | Job | Frequency | Does |
 |---|---|---|
 | `expire-requests` | every 15 min | `requested` past `respond_by` → `expired`, strike, email guest alternatives |
