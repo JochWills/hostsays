@@ -42,8 +42,16 @@ You are building **HostSays** (hostsays.com): a marketplace where travellers dis
 - After finishing each phase in `docs/09-build-plan.md`, tick its checklist and summarise what changed.
 - If a decision isn't covered in the docs, stop and ask rather than guessing.
 
-## Commands (fill in once the project is scaffolded)
-- `npm run dev` — local dev server
+## Commands
+- `npm run dev` — local dev server (http://localhost:3000)
 - `npm run build` — production build
 - `npm run lint` / `npm run typecheck`
-- `supabase start` / `supabase db reset` — local database
+- `npm run db:start` / `npm run db:stop` — local Supabase (needs Docker)
+- `npm run db:reset` — reapply migrations + `supabase/seed.sql` (local only)
+- `npm run db:push` — apply new migrations to the linked hosted project
+- `npm run db:types` — regenerate `lib/supabase/database.types.ts` from the linked project
+- Hosted project: `hostsays` (ref `dbcvagwmyofmlricojdb`, West EU). It's under a separate Supabase account from the claude.ai connector, so use the CLI (already logged in and linked), not the connector.
+
+## Next.js 16 notes
+- This is Next.js 16: middleware is now `proxy.ts` (same API, exported `proxy` function). Read `AGENTS.md` and the bundled docs in `node_modules/next/dist/docs/` before using unfamiliar APIs.
+- Tailwind v4: tokens are mapped in `app/globals.css` (`@theme inline`), not a `tailwind.config` file. Breakpoints match the prototype: `sm` 620px, `md` 980px, `lg` 1180px.

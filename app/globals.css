@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* Design tokens from docs/04-design-system.md (taken from reference/homepage-prototype.html). */
+:root {
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --panel: rgba(236, 232, 224, 0.92);
+  --ink: #1e2723;
+  --muted: #6a706b;
+  --line: #e4e0d8;
+  --green: #2d4a3e;
+  --green-ink: #ffffff;
+  --gold: #e3a33b;
+  --pill: rgba(20, 26, 22, 0.62);
+  --hero: #2c1f11;
+  --shadow: 0 1px 2px rgba(30, 39, 35, 0.06), 0 6px 18px rgba(30, 39, 35, 0.07);
+  --gutter: clamp(18px, 5.8vw, 90px);
+  --hero-gutter: clamp(18px, 8.5vw, 130px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121614;
+    --surface: #1b211e;
+    --panel: #202723;
+    --ink: #e9ece9;
+    --muted: #a1a9a3;
+    --line: #2c3531;
+    --green: #5e9a82;
+    --green-ink: #0c1511;
+    --pill: rgba(10, 14, 12, 0.7);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121614;
+  --surface: #1b211e;
+  --panel: #202723;
+  --ink: #e9ece9;
+  --muted: #a1a9a3;
+  --line: #2c3531;
+  --green: #5e9a82;
+  --green-ink: #0c1511;
+  --pill: rgba(10, 14, 12, 0.7);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-green: var(--green);
+  --color-green-ink: var(--green-ink);
+  --color-gold: var(--gold);
+  --color-pill: var(--pill);
+  --color-hero: var(--hero);
+
+  --font-sans: var(--font-manrope), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+
+  --shadow-card: var(--shadow);
+
+  --breakpoint-sm: 620px;
+  --breakpoint-md: 980px;
+  --breakpoint-lg: 1180px;
+}
+
+/* Page container: max 1536px with fluid side gutters. */
+@utility wrap {
+  width: 100%;
+  max-width: 1536px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility wrap-hero {
+  width: 100%;
+  max-width: 1536px;
+  margin-inline: auto;
+  padding-inline: var(--hero-gutter);
+}
+
+@layer base {
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}

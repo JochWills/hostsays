@@ -3,12 +3,12 @@
 Work through phases in order. Tick items as you go (`- [x]`). After each phase: run lint, typecheck and build, and summarise changes.
 
 ## Phase 0 — Setup
-- [ ] Scaffold Next.js (App Router, TypeScript, ESLint, Tailwind, `src/` optional)
-- [ ] Add Supabase (`@supabase/ssr`), Zod, Resend, React Email, Lucide icons
-- [ ] `lib/config.ts` with every constant from `02-business-rules.md`
-- [ ] Design tokens and fonts from `04-design-system.md` (CSS variables + Tailwind theme, Manrope + Playfair Display via `next/font`)
-- [ ] Supabase local dev set up; `.env.local` from `.env.example`
-- [ ] Basic layout: header, footer, "Staying at" pill slot
+- [x] Scaffold Next.js (App Router, TypeScript, ESLint, Tailwind, `src/` optional)
+- [x] Add Supabase (`@supabase/ssr`), Zod, Resend, React Email, Lucide icons
+- [x] `lib/config.ts` with every constant from `02-business-rules.md`
+- [x] Design tokens and fonts from `04-design-system.md` (CSS variables + Tailwind theme, Manrope + Playfair Display via `next/font`)
+- [x] Supabase set up; `.env.local` from `.env.example` — linked to hosted project `hostsays` (`dbcvagwmyofmlricojdb`, eu-west-1) via the CLI. Local Docker stack optional for later.
+- [x] Basic layout: header, footer, "Staying at" pill slot
 
 ## Phase 1 — Database
 - [ ] Migrations for all enums and tables in `05-data-model.md`
