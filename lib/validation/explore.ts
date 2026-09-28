@@ -6,6 +6,9 @@ const categoryValues = CATEGORIES.map((c) => c.value) as [string, ...string[]];
 
 /** Price caps offered in the filter, in rands. */
 export const PRICE_CAPS = [500, 1000, 2000, 3000];
+/** Price range slider: 0 to this many rands; the top end means "no maximum". Steps of PRICE_STEP. */
+export const PRICE_SLIDER_MAX = 5000;
+export const PRICE_STEP = 100;
 
 const optionalText = (max: number) =>
   z
@@ -30,6 +33,7 @@ export const exploreParams = z.object({
     .transform((v) => (v && isIsoDate(v) ? v : undefined))
     .catch(undefined),
   people: z.coerce.number().int().min(1).max(50).optional().catch(undefined),
+  min: z.coerce.number().int().min(1).max(100000).optional().catch(undefined),
   max: z.coerce.number().int().min(1).max(100000).optional().catch(undefined),
   sort: z.enum(["recommended", "price-asc", "price-desc"]).optional().catch(undefined),
 });

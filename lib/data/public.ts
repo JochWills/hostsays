@@ -166,6 +166,7 @@ export type ExploreFilters = {
   q?: string;
   date?: string;
   people?: number;
+  minPriceCents?: number;
   maxPriceCents?: number;
   sort?: "recommended" | "price-asc" | "price-desc";
 };
@@ -177,6 +178,7 @@ export async function searchExperiences(f: ExploreFilters): Promise<ExperienceCa
   else if (f.areaSlugs) query = query.in("area_slug", f.areaSlugs.length ? f.areaSlugs : ["-"]);
   if (f.category) query = query.eq("category", f.category);
   if (f.people) query = query.lte("min_people", f.people).gte("max_people", f.people);
+  if (f.minPriceCents != null) query = query.gte("price_cents", f.minPriceCents);
   if (f.maxPriceCents != null) query = query.lte("price_cents", f.maxPriceCents);
   if (f.q) {
     // Keep only characters that are safe inside a PostgREST filter string.

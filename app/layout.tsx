@@ -14,7 +14,8 @@ const manrope = Manrope({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  style: ["italic"],
+  // Italic for the homepage headline; normal for the Explore banner heading.
+  style: ["italic", "normal"],
 });
 
 export const metadata: Metadata = {

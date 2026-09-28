@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ExperienceCard as Card } from "@/lib/data/public";
-import { formatRand } from "@/lib/format";
+import { ArrowRight, Clock, UsersRound } from "lucide-react";
+import { formatDuration, formatRand } from "@/lib/format";
 import { publicImageUrl } from "@/lib/storage";
 import { PinIcon } from "@/components/icons/category-icon";
 import { Stars } from "@/components/ui/stars";
@@ -13,11 +14,14 @@ export function ExperienceCard({
   experience: e,
   tip,
   priority = false,
+  detailed = false,
 }: {
   experience: Card;
   /** A host's tip, shown on storefronts instead of the summary. */
   tip?: string;
   priority?: boolean;
+  /** Explore page: larger text plus length, group size and a "View details" button. */
+  detailed?: boolean;
 }) {
   const dots = e.hostPhotoPaths.length ? e.hostPhotoPaths.slice(0, 3) : [];
   return (
@@ -39,8 +43,10 @@ export function ExperienceCard({
         </span>
         <SaveButton id={e.id} name={e.title} />
       </div>
-      <div className="flex flex-1 flex-col gap-0.5 px-2.5 pt-2.5 pb-3 sm:px-[13px] sm:pt-3 sm:pb-3.5">
-        <h3 className="m-0 text-[14.5px] font-bold tracking-[-0.005em]">
+      <div
+        className={`flex flex-1 flex-col gap-0.5 ${detailed ? "px-3 pt-3 pb-3 sm:px-[18px] sm:pt-4 sm:pb-4" : "px-2.5 pt-2.5 pb-3 sm:px-[13px] sm:pt-3 sm:pb-3.5"}`}
+      >
+        <h3 className={`m-0 font-bold tracking-[-0.005em] ${detailed ? "text-[15px] sm:text-[17px]" : "text-[14.5px]"}`}>
           {/* Stretched link: the whole card is clickable, the heart stays a separate button. */}
           <Link href={`/x/${e.slug}`} className="after:absolute after:inset-0 after:content-['']">
             {e.title}
@@ -52,7 +58,9 @@ export function ExperienceCard({
             {tip}
           </p>
         ) : (
-          <p className="m-0 line-clamp-2 text-[13px] leading-[1.35] text-muted">{e.summary}</p>
+          <p className={`m-0 line-clamp-2 leading-[1.4] text-muted ${detailed ? "mt-0.5 text-[13px] sm:line-clamp-3 sm:text-[14.5px]" : "text-[13px]"}`}>
+            {e.summary}
+          </p>
         )}
         {e.rating != null && (
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[12.5px] text-muted">
@@ -60,7 +68,9 @@ export function ExperienceCard({
             {e.rating} ({e.reviewCount})
           </div>
         )}
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2.5">
+        <div
+          className={`flex flex-wrap items-center justify-between gap-2 ${detailed ? "mt-auto pt-3" : "mt-2.5 border-t border-line pt-2.5"}`}
+        >
           {e.hostCount > 0 ? (
             <span
               className="inline-flex items-center gap-1.5 text-[12px] font-semibold whitespace-nowrap text-green"
@@ -84,21 +94,50 @@ export function ExperienceCard({
           ) : (
             <span />
           )}
-          <span className="text-[13px] font-bold whitespace-nowrap text-ink">
+          <span className={`font-bold whitespace-nowrap text-ink ${detailed ? "text-[14px] sm:text-[15.5px]" : "text-[13px]"}`}>
             {formatRand(e.priceCents)}{" "}
             <small className="text-[11.5px] font-medium text-muted">{e.isGroupPrice ? "per group" : "pp"}</small>
           </span>
         </div>
+        {detailed && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3 text-[12.5px] text-muted sm:text-[13px]">
+            <span className="inline-flex items-center gap-1.5">
+              <Clock size={15} strokeWidth={1.8} aria-hidden="true" />
+              {formatDuration(e.durationMinutes)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <UsersRound size={15} strokeWidth={1.8} aria-hidden="true" />
+              {e.minPeople > 1 ? `Min ${e.minPeople}` : `Up to ${e.maxPeople}`}
+            </span>
+            {/* Visual only: the whole card is the link. */}
+            <span
+              aria-hidden="true"
+              className="ml-auto hidden items-center gap-2 rounded-full border border-line px-4 py-2 text-[13.5px] font-semibold text-ink group-hover:border-green sm:inline-flex"
+            >
+              View details <ArrowRight size={15} />
+            </span>
+          </div>
+        )}
       </div>
     </article>
   );
 }
 
-export function ExperienceGrid({ experiences, priorityCount = 0 }: { experiences: Card[]; priorityCount?: number }) {
+export function ExperienceGrid({
+  experiences,
+  priorityCount = 0,
+  detailed = false,
+  className = "grid-cols-2 md:grid-cols-4",
+}: {
+  experiences: Card[];
+  priorityCount?: number;
+  detailed?: boolean;
+  className?: string;
+}) {
   return (
-    <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-4">
+    <div className={`grid gap-2.5 sm:gap-3 ${className}`}>
       {experiences.map((e, i) => (
-        <ExperienceCard key={e.id} experience={e} priority={i < priorityCount} />
+        <ExperienceCard key={e.id} experience={e} priority={i < priorityCount} detailed={detailed} />
       ))}
     </div>
   );
