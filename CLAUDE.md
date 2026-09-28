@@ -49,7 +49,9 @@ You are building **HostSays** (hostsays.com): a marketplace where travellers dis
 - `npm run db:start` / `npm run db:stop` — local Supabase (needs Docker)
 - `npm run db:reset` — reapply migrations + `supabase/seed.sql` (local only)
 - `npm run db:push` — apply new migrations to the linked hosted project
-- `npm run db:types` — regenerate `lib/supabase/database.types.ts` from the linked project
+- `npm run db:types` — regenerate `lib/supabase/database.types.ts` from the linked project (run after every migration)
+- `npm run db:seed` — load/refresh demo data, photos and the admin user (`scripts/seed.mts`, safe to re-run)
+- `npm run db:test` — RLS and integrity checks against the linked project (`supabase/tests/`, rolled back)
 - Hosted project: `hostsays` (ref `dbcvagwmyofmlricojdb`, West EU). It's under a separate Supabase account from the claude.ai connector, so use the CLI (already logged in and linked), not the connector.
 
 ## Next.js 16 notes

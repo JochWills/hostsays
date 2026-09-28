@@ -11,11 +11,11 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [x] Basic layout: header, footer, "Staying at" pill slot
 
 ## Phase 1 — Database
-- [ ] Migrations for all enums and tables in `05-data-model.md`
-- [ ] RLS policies for every table
-- [ ] Views: `experience_cards`, `host_storefront`, host-safe booking view
-- [ ] Seed data (areas, demo operators/experiences/hosts/recommendations, admin user) using `reference/assets/` images uploaded to Storage
-- [ ] Typed Supabase client (`supabase gen types`)
+- [x] Migrations for all enums and tables in `05-data-model.md`
+- [x] RLS policies for every table
+- [x] Views: `experience_cards`, `host_storefront`, `host_cards`, host-safe bookings (`host_bookings()` function)
+- [x] Seed data (areas, demo operators/experiences/hosts/recommendations, admin user) using `reference/assets/` images uploaded to Storage — `npm run db:seed`
+- [x] Typed Supabase client (`supabase gen types`) — `npm run db:types` → `lib/supabase/database.types.ts`
 
 ## Phase 2 — Public site
 - [ ] Homepage matching `reference/homepage-prototype.html` (pixel-close on desktop and mobile), data from DB

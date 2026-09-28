@@ -12,7 +12,9 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --linked > lib/supabase/database.types.ts",
-    "db:push": "supabase db push"
+    "db:push": "supabase db push",
+    "db:seed": "node --env-file=.env.local scripts/seed.mts",
+    "db:test": "supabase db query --linked -f supabase/tests/rls-roles.sql && supabase db query --linked -f supabase/tests/rls-guards.sql"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",

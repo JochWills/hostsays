@@ -2,6 +2,22 @@
 
 Starting schema. Create it as Supabase migrations in `supabase/migrations/`. Adjust names if needed, but keep the concepts. **All money in integer cents (ZAR).**
 
+## As built (Phase 1) — changes from the starting schema below
+The migrations in `supabase/migrations/` are the real schema. Where they differ from this doc:
+- **Private fields split out** so public tables can be read safely:
+  - `host_private` (1:1 with hosts): `listing_url`, `contact_email`, `contact_phone`, `commission_rate` (capped at 0.10 so commission never exceeds the deposit).
+  - `host_bank_details` (1:1 with hosts): bank fields + `confirmed`. Decided with Josh: bank details in their own table.
+  - `operator_private` (1:1 with operators): `contact_email`, `contact_phone`, `terms_accepted_at`, `created_by_admin`, `claimed_at`.
+- **New columns:** `operators.is_demo` (seed placeholders), `hosts.featured_rank` and `experiences.featured_rank` (homepage features; null = not featured).
+- **Host-safe bookings** are a function, `host_bookings()`, not a view: it returns a host's referred bookings with guest first name only (no email, phone, notes or token).
+- **Extra view:** `host_cards` (verified hosts + pick count) for `/hosts`, area pages and the homepage.
+- **Areas are publicly readable**; `is_live` only controls what the site lists.
+- **Operators never see the booking `token`** (column-level grant).
+- **Access:** the hosted project doesn't auto-expose tables, so every grant is explicit. Admin *reads* via RLS; admin *writes*, status changes and anything touching money go through server code with the service role.
+- **Integrity in the database:** reserved/clashing slugs, "only verified hosts recommend", "hosts can't recommend their own operator's experiences", and booking money must add up (`deposit + balance = total`, `commission + platform = deposit`).
+- **Storage buckets** (public read): `experience-photos/<experience_id>/…`, `host-photos/<host_id>/…`, `operator-logos/<operator_id>/…`, `area-images/…` (admin only).
+- **Seed** is `scripts/seed.mts` (`npm run db:seed`), not `seed.sql`, because it uploads photos and creates the admin login through the API. Operators use real names where the prototype had them (decided with Josh) and are flagged `is_demo`; all seed contact emails are `@example.com`.
+
 ## Enums
 ```sql
 create type user_role as enum ('admin','host','operator');
