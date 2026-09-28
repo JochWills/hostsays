@@ -46,6 +46,7 @@ export type Database = {
           intro: string | null
           is_live: boolean
           name: string
+          province_id: string
           slug: string
           sort_order: number
         }
@@ -55,6 +56,7 @@ export type Database = {
           intro?: string | null
           is_live?: boolean
           name: string
+          province_id: string
           slug: string
           sort_order?: number
         }
@@ -64,10 +66,19 @@ export type Database = {
           intro?: string | null
           is_live?: boolean
           name?: string
+          province_id?: string
           slug?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "areas_province_id_fkey"
+            columns: ["province_id"]
+            isOneToOne: false
+            referencedRelation: "provinces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookings: {
         Row: {
@@ -1143,6 +1154,30 @@ export type Database = {
           id?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
+      provinces: {
+        Row: {
+          id: string
+          intro: string | null
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          intro?: string | null
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          intro?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
         }
         Relationships: []
       }

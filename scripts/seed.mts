@@ -152,7 +152,10 @@ async function seedAdmin() {
 async function main() {
   console.log(`Seeding ${url}`);
 
-  await upsert("areas", areas);
+  // Provinces are created by the migration; every demo area is in the Eastern Cape.
+  const { data: ec, error: ecError } = await db.from("provinces").select("id").eq("slug", "eastern-cape").single();
+  if (ecError) throw new Error(`provinces: ${ecError.message} (run the migrations first)`);
+  await upsert("areas", areas.map((a) => ({ ...a, province_id: ec.id })));
   await upsert("operators", operators);
   await upsert("operator_private", operatorPrivate, "operator_id");
 

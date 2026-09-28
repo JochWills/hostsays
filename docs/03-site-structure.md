@@ -7,13 +7,13 @@
 |---|---|---|
 | `/` | Home | Match `reference/homepage-prototype.html` exactly |
 | `/explore` | All experiences | Filters: area, category, date, group size, price. Sort: most recommended (default), price |
-| `/[slug]` | **Area page OR host storefront** | Shared namespace — see "Slug resolution" below |
+| `/[slug]` | **Area (town) page, province page OR host storefront** | Shared namespace — see "Slug resolution" below |
 | `/[area]/[category]` | Area + category page | e.g. `/addo/safari`. SEO landing pages |
 | `/x/[experience-slug]` | Experience page | Details, host recommendations, reviews, booking panel |
 | `/o/[operator-slug]` | Operator page | All of an operator's experiences |
 | `/how-it-works` | Guest explainer | Request → confirm → deposit → go |
 | `/hosts` | Hosts directory | All verified hosts, filter by area; cards link to storefronts |
-| `/areas` | Areas directory | All live areas; cards link to area pages |
+| `/areas` | "Where to go" | All 9 provinces (decided with Josh), each with its live towns; provinces with nothing yet say "Coming soon" |
 | `/for-hosts` | For hosts | Pitch + apply form |
 | `/for-operators` | For operators | Pitch + apply form |
 | `/about` | About | Story, trust, commission disclosure |
@@ -81,13 +81,13 @@ Every portal also has a settings page with **Your details** (name, phone) and **
 | `/admin/content` | Areas, categories, homepage featured items |
 
 ## Slug resolution for `/[slug]`
-Areas and hosts share the top-level namespace.
-1. Look up `areas.slug`. If found → render area page.
+Provinces, areas (towns) and hosts share the top-level namespace. **Areas sit inside provinces** (Eastern Cape → Gqeberha, Addo, …; decided with Josh). A province page (`/eastern-cape`) shows its towns, its experiences and hosts, or a "Coming soon" invitation to join. `/explore?area=` accepts a town or a province slug.
+1. Look up `areas.slug`, then `provinces.slug`. If found → render the area or province page.
 2. Else look up `hosts.slug` where `status = 'verified'`. If found → render host storefront **and set session attribution** (see `07-host-attribution.md`).
 3. Else 404.
 
 **Reserved slugs** (block for hosts and areas): `explore, x, o, b, r, host, hosts, areas, for-hosts, for-operators, operator, operators, admin, login, signup, sign-up, join, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml, coming-soon, preview`.
-When a host picks a slug, also block any existing area slug and validate: lowercase letters, numbers and hyphens, 3–40 characters.
+When a host picks a slug, also block any existing area or province slug and validate: lowercase letters, numbers and hyphens, 3–40 characters.
 
 ## Global UI
 - **Header** (on every public page): logo, nav (Experiences → `/explore`, Hosts → `/hosts`, Areas → `/areas`, How it works, For Hosts → `/for-hosts`), search icon, Sign in, "List your experience" button. On the homepage it sits transparent over the hero; elsewhere it's solid.

@@ -27,7 +27,7 @@ export default async function HostSettings() {
           <TextField name="name" label="Property name" defaultValue={s.name} />
           <Row>
             <SelectField name="hostType" label="Type of place" options={HOST_TYPES} defaultValue={s.type} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name }))} defaultValue={s.area_id} />
+            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={s.area_id} />
           </Row>
           <Row>
             <TextField name="contactEmail" label="Contact email" type="email" defaultValue={s.contact_email} hint="For HostSays to reach you. Not shown on the site." />

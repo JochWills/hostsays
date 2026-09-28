@@ -26,7 +26,7 @@ export default async function OperatorSettings() {
         <ActionForm action={saveOperatorDetails} submitLabel="Save">
           <Row>
             <TextField name="name" label="Business name" defaultValue={s.name} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name }))} defaultValue={s.area_id} />
+            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={s.area_id} />
           </Row>
           <TextArea name="description" label="About your business" rows={5} defaultValue={s.description} hint="Who you are and what you do, in a few friendly sentences." />
           <TextField name="website" label="Website or social page" inputMode="url" defaultValue={s.website} />

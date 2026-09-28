@@ -153,8 +153,16 @@ export function SelectField({
   options,
   placeholder,
   ...p
-}: Common & { options: readonly { value: string; label: string }[]; placeholder?: string }) {
+}: Common & { options: readonly { value: string; label: string; group?: string }[]; placeholder?: string }) {
   const f = useField(p.name, p.defaultValue);
+  // Options with a `group` (e.g. towns by province) are shown under <optgroup> headings, in order.
+  const groups = [...new Set(options.map((o) => o.group))];
+  const render = (list: readonly { value: string; label: string }[]) =>
+    list.map((o) => (
+      <option key={o.value} value={o.value}>
+        {o.label}
+      </option>
+    ));
   return (
     <Wrap name={p.name} label={p.label} hint={p.hint} error={f.error}>
       <select id={p.name} name={p.name} required={p.required} defaultValue={f.value} className={input} {...f.a11y}>
@@ -163,11 +171,15 @@ export function SelectField({
             {placeholder}
           </option>
         )}
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
+        {groups.map((g) =>
+          g ? (
+            <optgroup key={g} label={g}>
+              {render(options.filter((o) => o.group === g))}
+            </optgroup>
+          ) : (
+            render(options.filter((o) => !o.group))
+          ),
+        )}
       </select>
     </Wrap>
   );

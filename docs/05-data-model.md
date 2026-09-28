@@ -53,10 +53,18 @@ create table profiles (
 );
 ```
 
-### areas
+### provinces and areas
 ```sql
-create table areas (
+create table provinces (                -- all 9 South African provinces, seeded by the migration
   id uuid primary key default gen_random_uuid(),
+  slug text unique not null,            -- e.g. 'eastern-cape'; shares the top-level namespace
+  name text not null,
+  intro text,
+  sort_order int default 0
+);
+create table areas (                    -- towns, each in one province
+  id uuid primary key default gen_random_uuid(),
+  province_id uuid not null references provinces,
   slug text unique not null,            -- e.g. 'gqeberha', 'addo'
   name text not null,
   intro text,                           -- SEO intro copy

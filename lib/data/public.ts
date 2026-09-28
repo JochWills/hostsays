@@ -108,22 +108,41 @@ function byMostRecommended(a: ExperienceCard, b: ExperienceCard) {
 
 // ---------- Areas ----------
 
-export type Area = Row<"areas">;
+export type Area = Row<"areas"> & { province: { slug: string; name: string } | null };
+export type Province = Row<"provinces"> & { areas: Row<"areas">[] };
+
+const AREA_SELECT = "*, province:provinces(slug, name)";
 
 export async function getLiveAreas(): Promise<Area[]> {
   const db = createPublicClient();
-  return orThrow(await db.from("areas").select("*").eq("is_live", true).order("sort_order"), "areas");
+  return orThrow(await db.from("areas").select(AREA_SELECT).eq("is_live", true).order("sort_order"), "areas");
 }
 
-/** Every area (live or not), for sign-up forms. */
-export async function getAllAreas(): Promise<Pick<Area, "id" | "name">[]> {
+/** All 9 provinces in display order, each with its areas (live ones only unless `allAreas`). */
+export async function getProvinces({ allAreas = false } = {}): Promise<Province[]> {
   const db = createPublicClient();
-  return orThrow(await db.from("areas").select("id, name").order("sort_order"), "areas");
+  const rows = orThrow(await db.from("provinces").select("*, areas(*)").order("sort_order"), "provinces");
+  return rows.map((p) => ({
+    ...p,
+    areas: p.areas.filter((a) => allAreas || a.is_live).sort((a, b) => a.sort_order - b.sort_order),
+  }));
+}
+
+export async function getProvinceBySlug(slug: string): Promise<Province | null> {
+  const db = createPublicClient();
+  const row = oneOrNull(await db.from("provinces").select("*, areas(*)").eq("slug", slug).maybeSingle(), "province");
+  return row ? { ...row, areas: row.areas.sort((a, b) => a.sort_order - b.sort_order) } : null;
+}
+
+/** Every area (live or not) with its province, for forms: group options by `province`. */
+export async function getAllAreas(): Promise<{ id: string; name: string; province: string }[]> {
+  const provinces = await getProvinces({ allAreas: true });
+  return provinces.flatMap((p) => p.areas.map((a) => ({ id: a.id, name: a.name, province: p.name })));
 }
 
 export async function getAreaBySlug(slug: string): Promise<Area | null> {
   const db = createPublicClient();
-  return oneOrNull(await db.from("areas").select("*").eq("slug", slug).maybeSingle(), "area");
+  return oneOrNull(await db.from("areas").select(AREA_SELECT).eq("slug", slug).maybeSingle(), "area");
 }
 
 // ---------- Experiences ----------
@@ -141,6 +160,8 @@ export async function getFeaturedExperiences(limit = 4): Promise<ExperienceCard[
 
 export type ExploreFilters = {
   area?: string;
+  /** Every area slug in a province (province-wide search). */
+  areaSlugs?: string[];
   category?: Category;
   q?: string;
   date?: string;
@@ -153,6 +174,7 @@ export async function searchExperiences(f: ExploreFilters): Promise<ExperienceCa
   const db = createPublicClient();
   let query = db.from("experience_cards").select("*");
   if (f.area) query = query.eq("area_slug", f.area);
+  else if (f.areaSlugs) query = query.in("area_slug", f.areaSlugs.length ? f.areaSlugs : ["-"]);
   if (f.category) query = query.eq("category", f.category);
   if (f.people) query = query.lte("min_people", f.people).gte("max_people", f.people);
   if (f.maxPriceCents != null) query = query.lte("price_cents", f.maxPriceCents);
@@ -185,9 +207,11 @@ export async function searchExperiences(f: ExploreFilters): Promise<ExperienceCa
   return cards.sort(sorters[f.sort ?? "recommended"]);
 }
 
-export async function getExperiencesByArea(areaId: string): Promise<ExperienceCard[]> {
+export async function getExperiencesByArea(areaId: string | string[]): Promise<ExperienceCard[]> {
+  const ids = Array.isArray(areaId) ? areaId : [areaId];
+  if (!ids.length) return [];
   const db = createPublicClient();
-  const rows = orThrow(await db.from("experience_cards").select("*").eq("area_id", areaId), "area experiences");
+  const rows = orThrow(await db.from("experience_cards").select("*").in("area_id", ids), "area experiences");
   return rows.map(toExperienceCard).sort(byMostRecommended);
 }
 
@@ -295,10 +319,11 @@ export async function getOperatorBySlug(slug: string) {
 
 // ---------- Hosts ----------
 
-export async function getHostCards(opts: { areaId?: string; featuredFirst?: boolean; limit?: number } = {}) {
+export async function getHostCards(opts: { areaId?: string | string[]; featuredFirst?: boolean; limit?: number } = {}) {
   const db = createPublicClient();
   let query = db.from("host_cards").select("*");
-  if (opts.areaId) query = query.eq("area_id", opts.areaId);
+  if (Array.isArray(opts.areaId)) query = query.in("area_id", opts.areaId.length ? opts.areaId : ["00000000-0000-0000-0000-000000000000"]);
+  else if (opts.areaId) query = query.eq("area_id", opts.areaId);
   const cards = orThrow(await query, "host cards").map(toHostCard);
   cards.sort((a, b) =>
     opts.featuredFirst
@@ -332,13 +357,15 @@ export async function getStorefrontPicks(hostId: string): Promise<StorefrontPick
 
 export type TopLevel =
   | { kind: "area"; area: Area }
+  | { kind: "province"; province: Province }
   | { kind: "host"; host: HostCard }
   | null;
 
-/** Areas first, then verified hosts (docs/03-site-structure.md). */
+/** Areas, then provinces, then verified hosts (docs/03-site-structure.md). Slugs never clash across them. */
 export async function resolveTopLevelSlug(slug: string): Promise<TopLevel> {
-  const area = await getAreaBySlug(slug);
+  const [area, province] = await Promise.all([getAreaBySlug(slug), getProvinceBySlug(slug)]);
   if (area) return { kind: "area", area };
+  if (province) return { kind: "province", province };
   const host = await getHostBySlug(slug);
   if (host) return { kind: "host", host };
   return null;
@@ -348,13 +375,15 @@ export async function resolveTopLevelSlug(slug: string): Promise<TopLevel> {
 
 export async function getSitemapData() {
   const db = createPublicClient();
-  const [areas, experiences, operators, hosts] = await Promise.all([
+  const [provinces, areas, experiences, operators, hosts] = await Promise.all([
+    db.from("provinces").select("slug"),
     db.from("areas").select("slug, id").eq("is_live", true),
     db.from("experience_cards").select("slug, area_slug, category, operator_slug"),
     db.from("operators").select("slug").eq("status", "verified"),
     db.from("host_cards").select("slug"),
   ]);
   return {
+    provinces: orThrow(provinces, "provinces"),
     areas: orThrow(areas, "areas"),
     experiences: orThrow(experiences, "experiences"),
     operators: orThrow(operators, "operators"),

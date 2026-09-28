@@ -8,18 +8,21 @@ import { HowSteps } from "@/components/home/how-steps";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { HostGrid } from "@/components/cards/host-card";
 import { SectionHead } from "@/components/ui/section-head";
-import { getFeaturedExperiences, getHostCards, getLiveAreas } from "@/lib/data/public";
+import { getFeaturedExperiences, getHostCards, getLiveAreas, getProvinces } from "@/lib/data/public";
 import { minBookableDate } from "@/lib/dates";
 
 // Rebuild at most every 5 minutes; admin edits show up within that time.
 export const revalidate = 300;
 
 export default async function Home() {
-  const [experiences, hosts, areas] = await Promise.all([
+  const [experiences, hosts, areas, provinces] = await Promise.all([
     getFeaturedExperiences(4),
     getHostCards({ featuredFirst: true, limit: 4 }),
     getLiveAreas(),
+    getProvinces(),
   ]);
+  // Search suggestions: live towns first, then provinces.
+  const places = [...areas, ...provinces].map((a) => ({ slug: a.slug, name: a.name }));
 
   return (
     <>
@@ -41,7 +44,7 @@ export default async function Home() {
               guesthouses and hosts you stay with.
             </p>
           </div>
-          <HeroSearch areas={areas.map((a) => ({ slug: a.slug, name: a.name }))} minDate={minBookableDate()} />
+          <HeroSearch areas={places} minDate={minBookableDate()} />
           <div className="mt-[22px] pb-[26px] sm:pb-8">
             <CategoryChips onPhoto />
           </div>

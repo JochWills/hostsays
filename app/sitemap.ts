@@ -21,13 +21,14 @@ const STATIC_PAGES = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { areas, experiences, operators, hosts } = await getSitemapData();
+  const { provinces, areas, experiences, operators, hosts } = await getSitemapData();
 
   // Area + category pages only where there's something live.
   const areaCategories = new Set(experiences.map((e) => `/${e.area_slug}/${e.category}`));
 
   const paths = [
     ...STATIC_PAGES,
+    ...provinces.map((p) => `/${p.slug}`),
     ...areas.map((a) => `/${a.slug}`),
     ...areaCategories,
     ...experiences.map((e) => `/x/${e.slug}`),

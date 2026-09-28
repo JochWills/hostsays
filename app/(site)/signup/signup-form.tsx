@@ -6,7 +6,7 @@ import { signUp, type SignupState } from "./actions";
 import { HOST_TYPES, type AccountType } from "@/lib/validation/auth";
 import { btnPrimary, input, label, panel } from "@/components/ui/styles";
 
-type Props = { type: AccountType; areas: { id: string; name: string }[] };
+type Props = { type: AccountType; areas: { id: string; name: string; province: string }[] };
 
 const TERMS: Record<AccountType, React.ReactNode> = {
   guest: (
@@ -75,10 +75,16 @@ export function SignupForm({ type, areas }: Props) {
       <option value="" disabled>
         Choose your area
       </option>
-      {areas.map((a) => (
-        <option key={a.id} value={a.id}>
-          {a.name}
-        </option>
+      {[...new Set(areas.map((a) => a.province))].map((province) => (
+        <optgroup key={province} label={province}>
+          {areas
+            .filter((a) => a.province === province)
+            .map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+        </optgroup>
       ))}
     </select>,
   );

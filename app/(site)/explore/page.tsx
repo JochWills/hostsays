@@ -4,8 +4,8 @@ import { SlidersHorizontal } from "lucide-react";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { btnPrimary, input, label, pageTitle } from "@/components/ui/styles";
 import { CATEGORIES, categoryLabel, type Category } from "@/lib/categories";
-import { getLiveAreas, searchExperiences } from "@/lib/data/public";
-import { formatDate, formatPeople, formatRand } from "@/lib/format";
+import { getProvinces, searchExperiences } from "@/lib/data/public";
+import { formatDate, formatPeople, formatRand, provinceInSentence } from "@/lib/format";
 import { minBookableDate } from "@/lib/dates";
 import { exploreParams, firstValues, PRICE_CAPS } from "@/lib/validation/explore";
 
@@ -18,21 +18,26 @@ export const metadata: Metadata = {
 
 export default async function ExplorePage({ searchParams }: PageProps<"/explore">) {
   const params = exploreParams.parse(firstValues(await searchParams));
-  const areas = await getLiveAreas();
+  const provinces = await getProvinces();
+  const areas = provinces.flatMap((p) => p.areas);
 
-  // The homepage search sends free text in `where`: treat a matching area name as an area filter.
+  // `area` may be a town or a whole province. The homepage search sends free text in `where`: treat a
+  // matching town or province name as that filter, anything else as a search term.
   let areaSlug = params.area;
   let q = params.q;
   if (!areaSlug && params.where) {
     const w = params.where.toLowerCase();
-    const match = areas.find((a) => a.name.toLowerCase() === w || a.slug === w);
+    const match = [...areas, ...provinces].find((a) => a.name.toLowerCase() === w || a.slug === w);
     if (match) areaSlug = match.slug;
     else q = [params.where, q].filter(Boolean).join(" ");
   }
   const area = areas.find((a) => a.slug === areaSlug);
+  const province = area ? undefined : provinces.find((p) => p.slug === areaSlug);
+  const place = area ?? province;
 
   const results = await searchExperiences({
     area: area?.slug,
+    areaSlugs: province?.areas.map((a) => a.slug),
     category: params.category as Category | undefined,
     q,
     date: params.date,
@@ -42,7 +47,7 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
   });
 
   const active = [
-    area && area.name,
+    place && place.name,
     params.category && categoryLabel(params.category as Category),
     q && `“${q}”`,
     params.date && formatDate(params.date, { year: false }),
@@ -51,8 +56,8 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
   ].filter(Boolean);
 
   const formProps: FormProps = {
-    areas: areas.map((a) => ({ slug: a.slug, name: a.name })),
-    areaSlug: area?.slug,
+    provinces: provinces.map((p) => ({ slug: p.slug, name: p.name, areas: p.areas.map((a) => ({ slug: a.slug, name: a.name })) })),
+    areaSlug: place?.slug,
     category: params.category,
     date: params.date,
     people: params.people,
@@ -61,7 +66,7 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
     q,
   };
 
-  const heading = [params.category ? categoryLabel(params.category as Category) : "Things to do", area && `in ${area.name}`]
+  const heading = [params.category ? categoryLabel(params.category as Category) : "Things to do", place && `in ${province ? provinceInSentence(province.name) : place.name}`]
     .filter(Boolean)
     .join(" ");
 
@@ -112,7 +117,7 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
 }
 
 type FormProps = {
-  areas: { slug: string; name: string }[];
+  provinces: { slug: string; name: string; areas: { slug: string; name: string }[] }[];
   areaSlug?: string;
   category?: string;
   date?: string;
@@ -122,15 +127,20 @@ type FormProps = {
   q?: string;
 };
 
-function FilterForm({ idPrefix, areas, areaSlug, category, date, people, max, sort, q }: FormProps & { idPrefix: string }) {
+function FilterForm({ idPrefix, provinces, areaSlug, category, date, people, max, sort, q }: FormProps & { idPrefix: string }) {
   return (
         <form action="/explore" className="grid grid-cols-2 gap-3 px-5 pb-5 md:grid-cols-[repeat(6,minmax(0,1fr))_auto] md:items-end ">
           <div className="col-span-2 md:col-span-1">
             <label htmlFor={`${idPrefix}-area`} className={label}>Area</label>
             <select id={`${idPrefix}-area`} name="area" defaultValue={areaSlug ?? ""} className={input}>
               <option value="">Anywhere</option>
-              {areas.map((a) => (
-                <option key={a.slug} value={a.slug}>{a.name}</option>
+              {provinces.map((p) => (
+                <optgroup key={p.slug} label={p.name}>
+                  <option value={p.slug}>All of {provinceInSentence(p.name)}</option>
+                  {p.areas.map((a) => (
+                    <option key={a.slug} value={a.slug}>{a.name}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>

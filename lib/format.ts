@@ -45,3 +45,8 @@ export function formatPeople(n: number): string {
 export function formatPercent(rate: number): string {
   return `${Math.round(rate * 1000) / 10}%`;
 }
+
+/** Province names as used in a sentence: "the Eastern Cape", "the Free State", but "Gauteng", "KwaZulu-Natal". */
+export function provinceInSentence(name: string): string {
+  return /cape$|^free state$|^north west$/i.test(name) ? `the ${name}` : name;
+}

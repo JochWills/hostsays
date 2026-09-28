@@ -33,7 +33,7 @@ export function ExperienceForm({
   submitLabel,
 }: {
   action: FormAction;
-  areas: { id: string; name: string }[];
+  areas: { id: string; name: string; province: string }[];
   experience?: ExperienceValues;
   submitLabel: string;
 }) {
@@ -55,7 +55,7 @@ export function ExperienceForm({
           name="areaId"
           label="Area"
           placeholder="Choose the area"
-          options={areas.map((a) => ({ value: a.id, label: a.name }))}
+          options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))}
           defaultValue={e?.area_id}
         />
       </Row>
