@@ -1,20 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { PREVIEW_COOKIE, PREVIEW_KEY, matchesPreviewKey } from "@/lib/preview";
+import { PREVIEW_COOKIE, matchesPreviewKey } from "@/lib/preview";
 
 export const dynamic = "force-dynamic";
 
 /**
- * /preview?key=<PREVIEW_KEY> lets this browser past the coming-soon page (for a year).
+ * /preview?key=<key> lets this browser past the coming-soon page (for a year).
  * /preview?off locks it again. A wrong key just lands on the coming-soon page.
  */
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(new URL("/", request.url));
   const params = request.nextUrl.searchParams;
+  const key = params.get("key");
 
   if (params.has("off")) {
     response.cookies.delete(PREVIEW_COOKIE);
-  } else if (matchesPreviewKey(params.get("key"))) {
-    response.cookies.set(PREVIEW_COOKIE, PREVIEW_KEY, {
+  } else if (key && (await matchesPreviewKey(key))) {
+    response.cookies.set(PREVIEW_COOKIE, key, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

@@ -21,10 +21,6 @@ services:
         sync: false # https://www.hostsays.com (Render redirects hostsays.com to www)
       - key: ALLOW_INDEXING
         value: "false" # set to true at launch, once listings are real
-      - key: COMING_SOON
-        value: "true" # set to false at launch; until then visitors only see /coming-soon
-      - key: PREVIEW_KEY
-        sync: false # open /preview?key=<this value> to get past the coming-soon page in that browser
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
