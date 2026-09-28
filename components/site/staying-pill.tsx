@@ -18,7 +18,7 @@ export function useStayingHost(): StayingHost | null {
 }
 
 /** "Staying at [Host]" pill in the header, with × to forget the host. */
-export function StayingPill({ variant }: { variant: "overlay" | "solid" }) {
+export function StayingPill({ variant, className = "" }: { variant: "overlay" | "solid"; className?: string }) {
   const host = useStayingHost();
   if (!host) return null;
 
@@ -26,17 +26,17 @@ export function StayingPill({ variant }: { variant: "overlay" | "solid" }) {
   return (
     <span
       aria-live="polite"
-      className={`inline-flex max-w-[34vw] items-center gap-1.5 rounded-full border py-1.5 pr-1.5 pl-3 text-[13px] sm:max-w-[260px] ${styles}`}
+      className={`inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border py-1 pr-1 pl-3 text-[13px] sm:max-w-[320px] ${styles} ${className}`}
     >
       <span className="truncate">
-        <span className="hidden sm:inline">Staying at </span>
+        Staying at{" "}
         <b className="font-bold">{host.name}</b>
       </span>
       <button
         type="button"
         aria-label={`Forget ${host.name} as where you're staying`}
         onClick={clearStayingHost}
-        className="grid size-5 shrink-0 cursor-pointer place-items-center rounded-full text-[15px] leading-none opacity-80 hover:opacity-100"
+        className="-my-1 grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-[15px] leading-none opacity-80 hover:opacity-100"
       >
         ×
       </button>

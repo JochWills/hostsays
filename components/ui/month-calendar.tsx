@@ -17,6 +17,24 @@ const longLabel = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-ZA", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 /**
+ * Where the calendar opens when nothing is picked: the first day that can be picked, or the start of next
+ * month when this month has fewer than a week of pickable days left (so it doesn't open on a nearly empty month).
+ */
+function firstShownDate(minDate: string, maxDate: string, isAvailable: (date: string) => boolean) {
+  const nextMonth = iso(Number(minDate.slice(0, 4)), Number(minDate.slice(5, 7)), 1);
+  let firstOpen: string | null = null;
+  let openThisMonth = 0;
+  for (let d = minDate; d < nextMonth && d <= maxDate; d = addDays(d, 1)) {
+    if (!isAvailable(d)) continue;
+    firstOpen ??= d;
+    openThisMonth++;
+  }
+  if (openThisMonth >= 7 || nextMonth > maxDate) return firstOpen ?? minDate;
+  for (let d = nextMonth; d <= maxDate && d < addDays(nextMonth, 62); d = addDays(d, 1)) if (isAvailable(d)) return d;
+  return firstOpen ?? minDate;
+}
+
+/**
  * One month of days, Monday first. Dates are "YYYY-MM-DD" calendar dates. Only days between `minDate`
  * and `maxDate` for which `isAvailable` says yes can be picked. Arrow keys move between days
  * (PageUp/PageDown change month), Enter or Space picks.
@@ -36,7 +54,7 @@ export function MonthCalendar({
   isAvailable?: (date: string) => boolean;
   autoFocus?: boolean;
 }) {
-  const [focus, setFocus] = useState(value ?? minDate);
+  const [focus, setFocus] = useState(() => value ?? firstShownDate(minDate, maxDate, isAvailable));
   const [view, setView] = useState(() => ({ y: Number(focus.slice(0, 4)), m: Number(focus.slice(5, 7)) - 1 }));
   const gridRef = useRef<HTMLDivElement>(null);
   const keyboard = useRef(autoFocus);

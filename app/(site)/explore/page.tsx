@@ -14,9 +14,9 @@ import { Dropdown } from "@/components/ui/dropdown";
 import { exploreParams, firstValues, PRICE_CAPS, PRICE_SLIDER_MAX, PRICE_STEP } from "@/lib/validation/explore";
 
 export const metadata: Metadata = {
-  title: "Things to do on the Eastern Cape coast",
+  title: "Things to do in South Africa",
   description:
-    "Safaris, ocean trips, adventures and local favourites along the Eastern Cape coast, sorted by how many local hosts recommend them.",
+    "Safaris, ocean trips, adventures and local favourites, recommended by the guesthouses and hosts who live there.",
   alternates: { canonical: "/explore" },
 };
 
@@ -131,10 +131,10 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
             <span className="text-[13px] font-medium text-green group-open:hidden">Show</span>
             <span className="hidden text-[13px] font-medium text-green group-open:inline">Hide</span>
           </summary>
-          <FilterBar idPrefix="m" {...filterProps} />
+          <FilterBar idPrefix="m" layout="phone" {...filterProps} />
         </details>
         <div className="hidden rounded-[16px] bg-surface shadow-[0_10px_30px_rgba(30,39,35,0.12)] md:block">
-          <FilterBar idPrefix="d" {...filterProps} />
+          <FilterBar idPrefix="d" layout="desktop" {...filterProps} />
         </div>
       </div>
 
@@ -178,8 +178,8 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
         </aside>
 
         <div>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="text-[14px] text-muted md:hidden">
+          <div className="mb-4 md:hidden">
+            <p className="text-[14px] text-muted">
               <b className="text-ink">{count}</b>
               {active.length > 0 && (
                 <>
@@ -190,7 +190,6 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
                 </>
               )}
             </p>
-            <p className="ml-auto hidden text-[13.5px] text-muted md:block">{count}</p>
           </div>
 
           {results.length ? (
@@ -260,7 +259,24 @@ function Cell({ id, label, icon, children }: { id: string; label: string; icon: 
   );
 }
 
-function FilterBar({ idPrefix, provinces, areaSlug, category, date, people, min, max, sort, q }: FilterProps & { idPrefix: string }) {
+/**
+ * The filters as one form. On desktop the sidebar already has categories and the price slider, so the bar
+ * leaves those out (carrying their values along); on phones, where there's no sidebar, it has them all.
+ */
+function FilterBar({
+  idPrefix,
+  layout,
+  provinces,
+  areaSlug,
+  category,
+  date,
+  people,
+  min,
+  max,
+  sort,
+  q,
+}: FilterProps & { idPrefix: string; layout: "phone" | "desktop" }) {
+  const phone = layout === "phone";
   const icon = { size: 21, strokeWidth: 1.6 };
   const ids = (key: string) => ({ id: `${idPrefix}-${key}`, labelledBy: `${idPrefix}-${key}-label`, name: key, variant: "bare" as const });
   const areaOptions = [
@@ -276,13 +292,35 @@ function FilterBar({ idPrefix, provinces, areaSlug, category, date, people, min,
     ...(max && !PRICE_CAPS.includes(max) ? [{ value: String(max), label: `Up to ${formatRand(max * 100)}` }] : []),
   ];
   return (
-    <form action="/explore" className="grid gap-2.5 px-4 pb-4 md:grid-cols-4 md:items-center md:p-4 min-[1360px]:grid-cols-[1.1fr_1.1fr_1.1fr_0.8fr_0.95fr_1.55fr_auto] min-[1360px]:gap-0 min-[1360px]:p-3 min-[1360px]:pl-2">
+    <form
+      action="/explore"
+      className={
+        phone
+          ? "grid gap-2.5 px-4 pb-4"
+          : "grid grid-cols-3 items-center gap-2.5 p-4 min-[1360px]:grid-cols-[1.45fr_1.15fr_1fr_0.85fr_1.35fr_auto] min-[1360px]:gap-0 min-[1360px]:p-3 min-[1360px]:pl-2"
+      }
+    >
+      <Cell id={`${idPrefix}-q`} label="Search" icon={<Search {...icon} />}>
+        <input
+          id={`${idPrefix}-q`}
+          name="q"
+          type="search"
+          defaultValue={q ?? ""}
+          maxLength={80}
+          placeholder="Safari, snorkel, wine…"
+          className="w-full min-w-0 bg-transparent py-0.5 text-[15px] font-medium text-ink placeholder:font-normal placeholder:text-muted focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+        />
+      </Cell>
       <Cell id={`${idPrefix}-area`} label="Area" icon={<MapPin {...icon} />}>
         <Dropdown {...ids("area")} defaultValue={areaSlug ?? ""} options={areaOptions} />
       </Cell>
-      <Cell id={`${idPrefix}-category`} label="Category" icon={<Compass {...icon} />}>
-        <Dropdown {...ids("category")} defaultValue={category ?? ""} options={[{ value: "", label: "All" }, ...CATEGORIES.map((c) => ({ value: c.value, label: c.label }))]} />
-      </Cell>
+      {phone ? (
+        <Cell id={`${idPrefix}-category`} label="Category" icon={<Compass {...icon} />}>
+          <Dropdown {...ids("category")} defaultValue={category ?? ""} options={[{ value: "", label: "All" }, ...CATEGORIES.map((c) => ({ value: c.value, label: c.label }))]} />
+        </Cell>
+      ) : (
+        category && <input type="hidden" name="category" value={category} />
+      )}
       <Cell id={`${idPrefix}-date`} label="Date" icon={<CalendarDays {...icon} />}>
         <DatePicker {...ids("date")} defaultValue={date ?? ""} minDate={minBookableDate()} maxDate={addDays(minBookableDate(), 365)} />
       </Cell>
@@ -293,9 +331,13 @@ function FilterBar({ idPrefix, provinces, areaSlug, category, date, people, min,
           options={[{ value: "", label: "Any" }, ...Array.from({ length: 12 }, (_, i) => ({ value: String(i + 1), label: formatPeople(i + 1) }))]}
         />
       </Cell>
-      <Cell id={`${idPrefix}-max`} label="Price" icon={<Tag {...icon} />}>
-        <Dropdown {...ids("max")} defaultValue={max?.toString() ?? ""} options={priceOptions} />
-      </Cell>
+      {phone ? (
+        <Cell id={`${idPrefix}-max`} label="Price" icon={<Tag {...icon} />}>
+          <Dropdown {...ids("max")} defaultValue={max?.toString() ?? ""} options={priceOptions} />
+        </Cell>
+      ) : (
+        max && <input type="hidden" name="max" value={max} />
+      )}
       <Cell id={`${idPrefix}-sort`} label="Sort by" icon={<ArrowUpDown {...icon} />}>
         <Dropdown
           {...ids("sort")}
@@ -307,9 +349,11 @@ function FilterBar({ idPrefix, provinces, areaSlug, category, date, people, min,
           ]}
         />
       </Cell>
-      {q && <input type="hidden" name="q" value={q} />}
       {min && <input type="hidden" name="min" value={min} />}
-      <button type="submit" className={`${btnPrimary} mt-1 md:col-span-2 md:mt-0 md:h-full min-[1360px]:col-span-1 min-[1360px]:ml-3 min-[1360px]:h-auto min-[1360px]:py-[15px]`}>
+      <button
+        type="submit"
+        className={`${btnPrimary} ${phone ? "mt-1" : "h-full min-[1360px]:ml-3 min-[1360px]:h-auto min-[1360px]:py-[15px]"}`}
+      >
         <Search size={18} strokeWidth={2} aria-hidden="true" /> Show results
       </button>
     </form>

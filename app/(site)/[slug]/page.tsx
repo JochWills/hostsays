@@ -186,7 +186,9 @@ async function AreaPage({ area }: { area: Area }) {
         )}
       </section>
 
+      {/* Per-category rows only once "Most recommended" can't show everything; otherwise they'd repeat the same cards. */}
       {categories.length > 1 &&
+        experiences.length > 8 &&
         categories.map((c) => {
           const inCat = experiences.filter((e) => e.category === c.value);
           return (

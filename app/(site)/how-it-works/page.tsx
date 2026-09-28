@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HowSteps } from "@/components/home/how-steps";
 import { ProsePage } from "@/components/site/prose-page";
-import { CONFIRM_WINDOW_HOURS, DEPOSIT_RATE, PAYMENT_WINDOW_HOURS } from "@/lib/config";
+import { CONFIRM_WINDOW_HOURS, DEPOSIT_RATE, OFFER_WINDOW_HOURS, PAYMENT_WINDOW_HOURS } from "@/lib/config";
 import { formatPercent } from "@/lib/format";
 import { CANCELLATION_POLICY } from "@/lib/policy";
 
@@ -27,8 +26,9 @@ export default function HowItWorksPage() {
         </p>
         <h2>2. The operator confirms</h2>
         <p>
-          The operator has {CONFIRM_WINDOW_HOURS} hours to accept. We email you either way. If they can&rsquo;t take the
-          booking, we&rsquo;ll suggest similar experiences.
+          The operator has {CONFIRM_WINDOW_HOURS} hours to reply, and we email you either way. If your date is full, they
+          can offer you other dates or times instead: pick one within {OFFER_WINDOW_HOURS} hours and it&rsquo;s confirmed. If
+          none of them suit you, we&rsquo;ll suggest similar experiences.
         </p>
         <h2>3. Pay a {deposit} deposit</h2>
         <p>
@@ -42,23 +42,21 @@ export default function HowItWorksPage() {
         <p>
           <Link href="/cancellations">Read the full cancellation policy</Link>
         </p>
-        <h2>No accounts needed</h2>
+        <h2>No account needed</h2>
         <p>
           Every email we send links to your own booking page, where you can check the status, pay, see your voucher or
-          cancel.
+          cancel. If you&rsquo;d like all your bookings in one place, you can <Link href="/signup?as=guest">create a free
+          account</Link> any time.
         </p>
         <h2>Why hosts recommend</h2>
         <p>
           Local hosts pick the experiences they&rsquo;d send their own guests on. Hosts earn a commission when you book
           through them. It doesn&rsquo;t change your price.
         </p>
-      </ProsePage>
-      <div className="wrap">
-        <HowSteps id="how-steps" />
-        <p className="mt-6">
-          <Link href="/explore" className="font-semibold text-green hover:underline">Find something to do →</Link>
+        <p>
+          <Link href="/explore">Find something to do →</Link>
         </p>
-      </div>
+      </ProsePage>
     </>
   );
 }

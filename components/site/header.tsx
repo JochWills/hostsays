@@ -19,16 +19,15 @@ export function Header({ variant = "solid" }: Props) {
       <Logo />
       <nav
         aria-label="Main"
-        className="ml-6 hidden gap-5 text-[14.5px] font-medium md:flex lg:ml-11 lg:gap-[30px]"
+        className="ml-11 hidden gap-[26px] text-[14.5px] font-medium lg:flex min-[1360px]:gap-[30px]"
       >
         {MAIN_NAV.map((l) => (
-          <Link key={l.href} href={l.href} className="opacity-95 hover:underline hover:underline-offset-[6px] hover:opacity-100">
+          <Link key={l.href} href={l.href} className="whitespace-nowrap opacity-95 hover:underline hover:underline-offset-[6px] hover:opacity-100">
             {l.label}
           </Link>
         ))}
       </nav>
-      <div className="ml-auto flex items-center gap-2.5 text-[14.5px] font-medium sm:gap-[26px]">
-        <StayingPill variant={variant} />
+      <div className="ml-auto flex min-w-0 items-center gap-2.5 text-[14.5px] font-medium sm:gap-[26px]">
         <Link href="/explore" aria-label="Search experiences" className="grid place-items-center p-1.5">
           <Search size={20} strokeWidth={1.8} />
         </Link>
@@ -37,15 +36,29 @@ export function Header({ variant = "solid" }: Props) {
       </div>
     </div>
   );
+  // The top row is full, so the "Staying at" pill sits on its own line below it.
+  const pillRow = (
+    <div className="flex justify-end">
+      <StayingPill variant={variant} className="-mb-2 mt-2.5" />
+    </div>
+  );
 
   if (overlay) {
     // The homepage hero wraps this in its own background; keep it transparent.
-    return <div className="relative text-white">{inner}</div>;
+    return (
+      <div className="relative text-white">
+        {inner}
+        {pillRow}
+      </div>
+    );
   }
 
   return (
     <header className="border-b border-line bg-surface pb-[18px] text-ink">
-      <div className="wrap">{inner}</div>
+      <div className="wrap">
+        {inner}
+        {pillRow}
+      </div>
     </header>
   );
 }

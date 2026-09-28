@@ -3,7 +3,7 @@ export const MAIN_NAV = [
   { href: "/hosts", label: "Hosts" },
   { href: "/areas", label: "Areas" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/for-hosts", label: "For Hosts" },
+  { href: "/for-hosts", label: "For hosts" },
 ] as const;
 
 export const FOOTER_NAV = [

@@ -9,9 +9,9 @@ export function Footer() {
           <div className="text-xl font-extrabold tracking-[-0.02em] text-ink">HostSays</div>
           <div className="mt-1.5">Things to do, recommended by local hosts.</div>
         </div>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-[22px] gap-y-2">
+        <nav aria-label="Footer" className="-my-2 flex flex-wrap gap-x-[22px] md:my-0 md:gap-y-2">
           {FOOTER_NAV.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-ink">
+            <Link key={l.href} href={l.href} className="py-2 hover:text-ink md:py-0">
               {l.label}
             </Link>
           ))}

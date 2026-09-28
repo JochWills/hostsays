@@ -74,7 +74,7 @@ export function HeaderAccount({ overlay }: { overlay: boolean }) {
   if (!me?.signedIn) {
     return (
       <>
-        <Link href="/login" className="hidden md:inline">
+        <Link href="/login" className="hidden whitespace-nowrap lg:inline">
           Sign in
         </Link>
         <Link

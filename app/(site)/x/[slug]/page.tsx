@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Check, Clock, ExternalLink, MapPin, Users } from "lucide-react";
+import { BookBar } from "@/components/booking/book-bar";
 import { BookingPanel } from "@/components/booking/booking-panel";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { CategoryIcon } from "@/components/icons/category-icon";
@@ -274,12 +275,12 @@ export default async function ExperiencePage({ params }: PageProps<"/x/[slug]">)
       )}
 
       {/* Phones: price + jump to the booking panel, always in reach. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-4 border-t border-line bg-surface px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] md:hidden">
+      <BookBar>
         <p className="text-[15px] font-bold">
           {formatRand(e.price_cents)} <span className="text-[13px] font-medium text-muted">{e.is_group_price ? "per group" : "pp"}</span>
         </p>
         <a href="#book" className={btnPrimary}>Check dates</a>
-      </div>
+      </BookBar>
     </div>
   );
 }
