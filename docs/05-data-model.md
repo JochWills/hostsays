@@ -199,7 +199,7 @@ Capacity check: sum of `people` for bookings in `confirmed` or `paid` on that da
 
 Calendar export: add `calendar_feed_token text unique` (random, regenerable) to `operators`.
 
-> **Not in the database yet:** `offered`/`offer_expired`, the new booking columns, `booking_offers`, `slot_overrides`, `operator_calendars`, `calendar_busy` and `calendar_feed_token` were added to this doc after the Phase 1 migrations. Add them in a migration at the start of Phase 4 drop the unused `alternative_date` column, and add `r` to `private.reserved_slugs()` (for the `/r/[token]` one-tap links).
+> **Not in the database yet:** `offered`/`offer_expired`, the new booking columns, `booking_offers`, `slot_overrides`, `operator_calendars`, `calendar_busy` and `calendar_feed_token` were added to this doc after the Phase 1 migrations. Add them in a migration at the start of Phase 4, drop the unused `alternative_date` column, and add `r` to `private.reserved_slugs()` (for the `/r/[token]` one-tap links).
 
 ### recommendations
 ```sql
