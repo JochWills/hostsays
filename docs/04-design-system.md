@@ -22,7 +22,7 @@ Define as CSS variables and map them into Tailwind (`theme.extend.colors`).
 | `--pill` | `rgba(20,26,22,.62)` | `rgba(10,14,12,.7)` | Location pills over photos |
 | Hero base | `#2C1F11` | same | Behind hero photo, left fade |
 
-Dark mode: redefine tokens under `@media (prefers-color-scheme: dark)` guarded by `:root:not([data-theme="light"])`, and again under `:root[data-theme="dark"]`.
+**Light mode only** (decided with Josh): no dark theme, and `color-scheme: light` so phones in dark mode don't restyle the site.
 
 ## Typography
 - **Sans (everything):** Manrope 400/500/600/700/800 (`next/font/google`), fallback `"Segoe UI", system-ui, sans-serif`
@@ -35,7 +35,7 @@ Dark mode: redefine tokens under `@media (prefers-color-scheme: dark)` guarded b
   - Small labels: 11–12.5px
 
 ## Layout
-- Max width 1536px, side padding `clamp(18px, 5.8vw, 90px)`; hero content inset `clamp(18px, 8.5vw, 130px)`
+- Max width 1536px, side padding `clamp(18px, 5.8vw, 90px)` on **every** page, including the homepage hero (one `wrap` container, so the header is always the same width)
 - Homepage main area: two columns — content `1fr` + sidebar `385px`, gap 22px. Collapses to one column under 1180px.
 - Card grids: 4 columns desktop → 2 columns under 980px (keep 2 on phones).
 - Mobile-first; test at 390px width.

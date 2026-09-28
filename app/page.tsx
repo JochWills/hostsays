@@ -28,7 +28,7 @@ export default async function Home() {
           aria-hidden="true"
           className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.35)_0%,rgba(0,0,0,.15)_40%,rgba(0,0,0,0)_60%),linear-gradient(180deg,rgba(0,0,0,.28)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_70%,rgba(0,0,0,.28)_100%)]"
         />
-        <div className="wrap-hero relative">
+        <div className="wrap relative">
           <Header variant="overlay" />
           <div className="max-w-[720px] pt-10 sm:pt-[62px]">
             <h1 className="m-0 text-[clamp(34px,4.6vw,56px)] leading-[1.05] font-extrabold tracking-[-0.025em] [text-shadow:0_2px_20px_rgba(0,0,0,.25)]">

@@ -17,7 +17,7 @@ export default function ComingSoon() {
         aria-hidden="true"
         className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.35)_0%,rgba(0,0,0,.15)_40%,rgba(0,0,0,0)_60%),linear-gradient(180deg,rgba(0,0,0,.28)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_70%,rgba(0,0,0,.28)_100%)]"
       />
-      <div className="wrap-hero relative flex flex-1 flex-col">
+      <div className="wrap relative flex flex-1 flex-col">
         <header className="pt-[26px] sm:pt-8">
           <Logo onPhoto />
         </header>

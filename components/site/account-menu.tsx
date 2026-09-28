@@ -80,7 +80,7 @@ export function HeaderAccount({ overlay }: { overlay: boolean }) {
         <Link
           href="/for-operators"
           className={`hidden items-center gap-2.5 rounded-[14px] px-[26px] py-[13px] font-semibold whitespace-nowrap hover:brightness-110 sm:inline-flex ${
-            overlay ? "border border-white/10 bg-[#2D4A3E] text-white" : "bg-green text-green-ink"
+            overlay ? "border border-white/10 bg-[#2D4A3E] text-white" : "border border-transparent bg-green text-green-ink"
           }`}
         >
           List your experience
