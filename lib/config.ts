@@ -24,6 +24,12 @@ export const MIN_LEAD_DAYS = 1;
 export const REQUEST_REMINDER_HOURS_LEFT = 3;
 /** Remind the guest when this many hours are left to pay. */
 export const PAYMENT_REMINDER_HOURS_LEFT = 6;
+/** Most other dates/times an operator can offer instead of the requested one. */
+export const MAX_ALTERNATIVES = 3;
+/** Guest must pick one of the operator's offered times within this many hours. */
+export const OFFER_WINDOW_HOURS = 24;
+/** One-tap operator email links (other than request links, which expire at the reply deadline) last this long. */
+export const ACTION_LINK_DAYS = 7;
 
 // ---------- Cancellations ----------
 /** Guest cancellations this many days or more before the experience get a full deposit refund. */

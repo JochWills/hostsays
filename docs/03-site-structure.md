@@ -27,6 +27,12 @@
 | `/b/[token]/pay` | Starts Paystack checkout (server redirect) |
 | `/b/[token]/review` | Review form (only when completed) |
 
+### Operator one-tap links (no sign-in, from emails)
+| Route | Page |
+|---|---|
+| `/r/[token]` | Signed, expiring link. Shows one request (Accept / Offer another time / Decline) or the coming week's availability ("this day is full"). Only button presses (POST) change anything. |
+| `/api/calendar/[feed_token].ics` | Operator's private calendar feed of HostSays bookings |
+
 ### Auth
 | Route | Page |
 |---|---|
@@ -49,11 +55,11 @@
 | Route | Page |
 |---|---|
 | `/operator` | Dashboard: new requests with countdown, upcoming trips, stats |
-| `/operator/requests` | Accept / decline (reason + optional alternative date) |
+| `/operator/requests` | Accept, Offer another time (1–3 dates/times), or Decline (reason) |
 | `/operator/bookings` | Upcoming and past; mark completed / no-show; cancel (reason, weather flag) |
 | `/operator/experiences` | List; create/edit (submits for approval) |
 | `/operator/experiences/[id]` | Edit form with photos, pricing, slots, policies |
-| `/operator/availability` | Weekly slots, capacity, blackout dates |
+| `/operator/availability` | Weekly slots and capacity; close a day or one slot, or change spots left on a date; connect a calendar (import) and copy the private calendar address (export) |
 | `/operator/statements` | Bookings and deposits collected by HostSays |
 | `/operator/settings` | Business details, team, notification email, accept operator terms |
 
@@ -128,10 +134,11 @@ Content (featured experiences and hosts) comes from the database, managed in `/a
 ### Guest booking page `/b/[token]`
 Changes by status:
 - `requested`: "Waiting for [Operator] to confirm (by [time])", Cancel request
+- `offered`: "[Operator] can't do [date], but can do…": one button per offered date/time (full ones greyed out), "None of these work", pick-by time
 - `confirmed`: "Confirmed! Pay your R[deposit] deposit by [time] to lock it in", Pay button, policy reminder
 - `paid`: Voucher — reference, experience, date/time, meeting point, **"Balance due to operator on the day: R[balance]"** in large text, operator contact, Cancel (with the right refund message)
 - `completed`: Thanks + review form link
-- `declined` / `expired` / `payment_expired`: explanation + 3 alternative experiences
+- `declined` / `expired` / `offer_expired` / `payment_expired`: explanation + 3 similar experiences
 - `cancelled_*`: refund status
 
 ## SEO

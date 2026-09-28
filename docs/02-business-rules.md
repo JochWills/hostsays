@@ -14,7 +14,7 @@ If anything in code or prototypes disagrees with this file, this file wins. Put 
 
 - The **booking total** = operator's listed price per person × number of people (or a fixed group price if the listing uses one).
 - The deposit **counts toward the total**. The guest never pays more than the listed price.
-- The guest pays the **balance (90%) directly to the operator** on the day. HostSays never handles the balance.
+- The guest pays the **balance (90%) directly to the operator**, on the day or however the operator normally takes payment. HostSays never handles the balance.
 - Paystack fees are paid from HostSays's share.
 - Rounding: compute deposit and commission in cents with `Math.round`. HostSays share = deposit − host commission (so the numbers always add up).
 - The 6% is marketed as the **"Founding host rate"**. Store each host's rate on the host record (`commission_rate`, default 0.06) so it can change later per host.
@@ -27,6 +27,34 @@ If anything in code or prototypes disagrees with this file, this file wins. Put 
 - Operator must **accept or decline within 12 hours** (`CONFIRM_WINDOW_HOURS = 12`). A reminder email goes out before expiry. Unanswered requests expire automatically.
 - If accepted, the guest has **24 hours to pay** the deposit (`PAYMENT_WINDOW_HOURS = 24`). If unpaid, the hold is released and the booking becomes `payment_expired`.
 - Requests can't be made for the same day at launch; minimum date is tomorrow (`MIN_LEAD_DAYS = 1`). Confirm this with Josh if it needs changing.
+- The operator has three choices: **Accept**, **Offer another time**, or **Decline**.
+- **Offer another time:** the operator suggests 1–3 other dates/times (`MAX_ALTERNATIVES = 3`). The guest has 24 hours to pick one (`OFFER_WINDOW_HOURS = 24`). Picking one confirms the booking straight away (the operator already agreed), so the guest goes directly to paying the deposit. If none suit, the guest taps "None of these work" and is shown similar experiences. An offer counts as a response: **no strike**.
+- **Decline** is for when there's nothing to offer (not operating, weather, other). The guest is shown similar experiences.
+
+## How any operator works with HostSays
+We never plug into how an operator runs their business. Whatever they use (WhatsApp, a diary, booking software), every operator only has to do three things with us:
+1. **Answer requests:** Accept, Offer another time, or Decline. They check their own diary or system however they like.
+2. **Treat our deposit as part-payment.** The guest pays 10% online to HostSays; the operator collects the 90% balance however they normally do (cash, card machine, EFT, their own payment link). We never handle the balance.
+3. **Confirm the trip happened:** Done or No-show.
+
+Operators agree to two rules in their terms (checkbox before going live):
+- **Price parity:** the price on HostSays is the same as booking with them directly.
+- **The deposit counts as paid:** they only collect the balance, never the full price again.
+
+The operator's phone number and email are **never shown to guests before the deposit is paid**, so bookings can't be moved off the platform.
+
+**One-tap links:** every email asking an operator to act (new request, reminders, weekly availability check, mark completed) contains private links that work **without signing in**. They open a short page with big buttons; the action only happens when a button is pressed (email scanners open links automatically, so a link alone must never change anything). Links expire (a request link at its reply deadline, others after 7 days).
+
+## Availability
+Guests can only request dates and times the operator has set up (weekly time slots with a capacity). A slot shows as full when confirmed + paid bookings reach its capacity. Operators keep this up to date in up to three ways:
+1. **By hand (everyone):** one tap to close a day or a single time slot, or to change the spots left on a date. A **weekly email** (Monday morning) shows the coming week with one-tap "this day is full" links.
+2. **Calendar sync (optional, recommended):**
+   - **Import:** the operator pastes their calendar's private address (Google, Outlook or Apple Calendar all provide one). We check it every 15 minutes. Any event that overlaps a time slot closes that slot; an all-day event closes the whole day. A calendar can apply to all of an operator's experiences or to one.
+   - **Export:** each operator gets a private calendar address listing their HostSays bookings, to add to their own calendar so they don't double-book elsewhere.
+   - A calendar only says busy or free, not "3 spots left". That suits operators who run one trip at a time.
+3. **Booking-system connection (later):** live spots left and instant booking through the open **OCTO** standard, built once rather than per system. Only once many operators use OCTO-compatible software.
+
+No sync is perfect, so request-to-book and "Offer another time" stay as the safety net.
 
 ## Guests
 - **No guest accounts.** Each booking has a secret token; the guest manages it at `/b/[token]`, linked from every email.

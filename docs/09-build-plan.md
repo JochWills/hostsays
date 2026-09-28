@@ -37,18 +37,22 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 ## Phase 4 — Booking engine
 - [ ] `lib/bookings/pricing.ts` (pure functions + unit tests for deposit/commission/rounding)
 - [ ] `lib/bookings/transitions.ts` (whitelisted state machine + tests)
-- [ ] `createBookingRequest` server action with validation, capacity/blackout checks, rate limiting
-- [ ] Guest page `/b/[token]` for every status
+- [ ] Migration for offers and availability (see note in `05-data-model.md`): `offered`/`offer_expired`, `booking_offers`, `slot_overrides`, `operator_calendars`, `calendar_busy`, `calendar_feed_token`
+- [ ] `lib/bookings/availability.ts`: one function deciding if a date + slot is requestable (slots, blackouts, overrides, calendar busy, capacity) + tests
+- [ ] `createBookingRequest` server action with validation, availability checks, rate limiting
+- [ ] Guest page `/b/[token]` for every status, including picking an offered time
 - [ ] Paystack initialize, webhook (signature + amount verification, idempotent), verify fallback
 - [ ] Guest cancellation with correct refund logic; Paystack refunds + refund webhook
 - [ ] Emails for all guest events (`08-emails.md`)
 
 ## Phase 5 — Operator portal
 - [ ] Auth (login, invites, roles), route protection — _started early: `/login` (password or emailed link), `/auth/callback`, sign-out, role guards and placeholder `/admin`, `/host`, `/operator` pages. Invites still to do._
-- [ ] Requests: accept/decline with countdown
+- [ ] Requests: accept / offer another time / decline with countdown
+- [ ] One-tap links `/r/[token]` (signed, expiring, GET shows, POST acts) for requests, weekly availability and mark completed
 - [ ] Bookings: complete, no-show, cancel (weather flag)
 - [ ] Experiences CRUD with photo upload → submit for approval; live edits go to `pending_changes`
-- [ ] Availability: weekly slots, capacity, blackouts
+- [ ] Availability: weekly slots, capacity, blackouts, close a slot / change spots left on a date
+- [ ] Calendar import (safe .ics fetch) and private calendar export feed
 - [ ] Statements
 - [ ] Operator terms acceptance
 - [ ] Operator emails
@@ -73,7 +77,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Payouts: monthly draft, CSV export, mark paid, statements
 
 ## Phase 8 — Scheduled jobs
-- [ ] All cron jobs in `06-booking-flow.md`, protected with `CRON_SECRET`, idempotent
+- [ ] All cron jobs in `06-booking-flow.md` (incl. `expire-offers`, `sync-calendars`, `weekly-availability`), protected with `CRON_SECRET`, idempotent
 - [ ] Supabase Cron schedule (pg_cron + pg_net, every 15 min) calling `/api/cron/*` with `CRON_SECRET` from Supabase Vault
 
 ## Phase 9 — Reviews
@@ -93,6 +97,6 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 ## Later (not now)
 - WhatsApp notifications
 - Instant booking for fixed-slot experiences
-- Operator booking-system integrations (e.g. Bókun, Rezdy, FareHarbor)
+- Operator booking-system integrations (e.g. Bókun, Rezdy, FareHarbor) via the open **OCTO** standard: build once, not per system. Gives live spots left and instant booking. Only when enough operators use OCTO-compatible software.
 - Packages/bundles, featured placements (clearly labelled), tiered host commission
 - Afrikaans/German languages, mobile app

@@ -27,6 +27,7 @@ create type listing_status as enum ('draft','pending_review','live','paused','re
 create type category as enum ('safari','ocean','adventure','food','culture','wellness');
 create type booking_status as enum (
   'requested','confirmed','paid','completed','no_show',
+  'offered','offer_expired',       -- operator offered other times / guest didn't pick in time
   'declined','expired','payment_expired',
   'cancelled_by_guest_request',   -- guest cancelled before paying
   'cancelled_guest_refunded',     -- guest cancelled 7+ days before, deposit refunded
@@ -169,7 +170,36 @@ create table experience_blackouts (
   primary key (experience_id, date)
 );
 ```
-Capacity check: sum of `people` for bookings in `confirmed` or `paid` on that date+slot must not exceed capacity. `requested` bookings don't hold capacity (the operator decides).
+create table slot_overrides (           -- one date + slot differs from the weekly pattern
+  experience_id uuid references experiences on delete cascade,
+  date date not null,
+  start_time time not null,
+  capacity int not null check (capacity >= 0),   -- 0 = closed, n = spots for that date
+  primary key (experience_id, date, start_time)
+);
+create table operator_calendars (       -- imported calendar (Google/Outlook/Apple .ics address)
+  id uuid primary key default gen_random_uuid(),
+  operator_id uuid references operators on delete cascade not null,
+  experience_id uuid references experiences on delete cascade,  -- null = all the operator's experiences
+  ics_url text not null,                -- private address: never exposed to anon or other operators
+  last_synced_at timestamptz,
+  failure_count int default 0,
+  last_error text,
+  created_at timestamptz default now()
+);
+create table calendar_busy (            -- event times only, no titles or descriptions
+  calendar_id uuid references operator_calendars on delete cascade,
+  starts_at timestamptz not null,
+  ends_at timestamptz not null,
+  all_day boolean default false
+);
+create index on calendar_busy (calendar_id, starts_at);
+```
+Capacity check: sum of `people` for bookings in `confirmed` or `paid` on that date+slot must not exceed capacity (the `slot_overrides` capacity if there is one, else the weekly slot's). `requested` and `offered` bookings don't hold capacity (the operator decides). Full rules for what's requestable are in `06-booking-flow.md` → Availability.
+
+Calendar export: add `calendar_feed_token text unique` (random, regenerable) to `operators`.
+
+> **Not in the database yet:** `offered`/`offer_expired`, the new booking columns, `booking_offers`, `slot_overrides`, `operator_calendars`, `calendar_busy` and `calendar_feed_token` were added to this doc after the Phase 1 migrations. Add them in a migration at the start of Phase 4 drop the unused `alternative_date` column, and add `r` to `private.reserved_slugs()` (for the `/r/[token]` one-tap links).
 
 ### recommendations
 ```sql
@@ -216,13 +246,23 @@ create table bookings (
   pay_by timestamptz,                   -- confirmed_at + 24h
   confirmed_at timestamptz, paid_at timestamptz, completed_at timestamptz, cancelled_at timestamptz,
   decline_reason text, cancel_reason text, cancelled_for_weather boolean default false,
-  alternative_date date,                -- operator's suggestion when declining
+  requested_date date,                  -- guest's original choice, kept if they pick an offered time
+  requested_start_time time,
+  offer_expires_at timestamptz,         -- set when status = 'offered'
   payout_id uuid,                       -- set when included in a host payout
   created_at timestamptz default now()
 );
 create index on bookings (operator_id, status);
 create index on bookings (host_id, status);
 create index on bookings (date);
+
+create table booking_offers (           -- operator's "Offer another time" options (max 3)
+  id uuid primary key default gen_random_uuid(),
+  booking_id uuid references bookings on delete cascade not null,
+  date date not null,
+  start_time time not null,
+  unique (booking_id, date, start_time)
+);
 ```
 
 ### payments
@@ -301,6 +341,9 @@ Enable RLS on **every** table.
 |---|---|---|---|---|
 | areas, categories | read live | read | read | all |
 | experiences, photos, slots, blackouts | read `live` | read live | CRUD own (status changes via server) | all |
+| slot_overrides | read for live experiences | read | CRUD own | all |
+| operator_calendars, calendar_busy | none | — | read/delete own; add via server (URL checked) | all |
+| booking_offers | none (guest via server using token) | — | read own; create via server | all |
 | operators | read verified (no private contact fields via view) | — | read/update own | all |
 | hosts | read verified public fields via view | read/update own (incl. bank) | — | all |
 | recommendations | read not hidden | CRUD own | read on own experiences | all |

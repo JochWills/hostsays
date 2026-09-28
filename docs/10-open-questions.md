@@ -8,7 +8,15 @@ Don't guess these. Ask Josh, then move the answer into the right doc.
 - [ ] Same-day requests: allowed or not? (Currently minimum = tomorrow.)
 - [ ] Group-priced experiences (e.g. private charters): needed at launch?
 - [ ] Child pricing / age limits per experience?
-- [ ] Should operators be able to suggest a different time slot when declining, not just a date?
+- [ ] "I'm flexible" on the request form (e.g. "any day Tue–Thu works"), so the operator can accept on whichever day suits? Not planned yet.
+- [ ] WhatsApp alerts to operators: keep for later, or bring forward to launch? (Meta's WhatsApp Business messages cost a few cents each and message templates need Meta approval.)
+
+## Ask on the first operator calls
+- [ ] How do people book with you now (WhatsApp, phone, email, website, booking software — which one)?
+- [ ] How do guests pay you (cash, card machine, EFT, online)?
+- [ ] Do you keep bookings in a calendar? Which one (Google, Outlook, Apple, paper)?
+- [ ] How would you like to hear about a new request (email, WhatsApp, SMS)?
+- [ ] Is your HostSays price the same as booking with you directly?
 
 ## Legal and finance
 - [ ] Which company owns HostSays (e.g. NOX Media Group or a new entity)?

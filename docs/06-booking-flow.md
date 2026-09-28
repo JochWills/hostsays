@@ -11,7 +11,10 @@ requested ──accept──▶ confirmed ──pay──▶ paid ──mark com
     │                    └─guest cancels────────────────────────▶ cancelled_by_guest_request
     ├─decline───────────────────────────────────────────────────▶ declined
     ├─12h no response───────────────────────────────────────────▶ expired
-    └─guest cancels─────────────────────────────────────────────▶ cancelled_by_guest_request
+    ├─guest cancels─────────────────────────────────────────────▶ cancelled_by_guest_request
+    └─offer another time──▶ offered ──guest picks an option──▶ confirmed (same path as above)
+                              ├─"none of these work"─────────────▶ cancelled_by_guest_request
+                              └─24h no pick─────────────────────▶ offer_expired
 ```
 Implement transitions in one module (`lib/bookings/transitions.ts`) with a whitelist. Any other transition throws. Each transition: updates status + timestamp, sets commission status, sends emails, logs strikes where relevant.
 
@@ -33,8 +36,35 @@ Server action `createBookingRequest`:
 Rate-limit requests per IP/email to prevent spam.
 
 ## 2. Operator responds
-- **Accept:** check capacity (confirmed + paid people for that date/slot + this booking ≤ capacity). Status `confirmed`, `pay_by = now() + 24h`. Email guest with pay link.
-- **Decline:** reason required (dropdown: fully booked, weather, not operating, other) + optional alternative date. Email guest with alternatives.
+The operator answers from `/operator/requests` or from the one-tap link in the request email (see **One-tap links** below).
+
+- **Accept:** check capacity (confirmed + paid people for that date/slot + this booking ≤ capacity) and that the slot isn't closed (blackout, override or calendar sync). Status `confirmed`, `pay_by = now() + 24h`. Email guest with pay link.
+- **Offer another time:** operator picks 1–`MAX_ALTERNATIVES` dates/slots from their own available slots (same rules as a guest request: ≥ tomorrow, slot exists, not closed, capacity for this group). Save them in `booking_offers`, status `offered`, `offer_expires_at = now() + OFFER_WINDOW_HOURS`. Email guest "[Operator] can't do [date], but can do…" with one button per option. Counts as a response: **no strike**.
+  - **Guest picks an option** (`/b/[token]`): re-check capacity for that option (show it as unavailable if it has filled since). Move the booking's `date`/`start_time` to the option (the original stays in `requested_date`/`requested_start_time`). Money doesn't change: the price is per experience. Status `confirmed`, `pay_by = now() + 24h`, same emails as Accept.
+  - **"None of these work":** `cancelled_by_guest_request`, show 3 similar experiences.
+  - **No pick in time:** `offer_expired` (cron), email guest similar experiences. No strike.
+- **Decline:** reason required (dropdown: fully booked with nothing else free, not operating, weather, other). No date to suggest: that's what "Offer another time" is for. Email guest with 3 similar experiences.
+
+### One-tap links (no sign-in)
+Operators often live in WhatsApp, not a dashboard, so every operator email that asks for an action carries private links that work without signing in.
+- Link = `/r/[token]`, where the token is an HMAC-SHA256-signed payload (`operator_id`, `booking_id` or scope, purpose, expiry) using `ACTION_LINK_SECRET`. Verify signature and expiry on the server; never trust anything else in the URL.
+- **GET only shows a page** (request summary + big Accept / Offer another time / Decline buttons, or the week's availability). **Only a POST changes anything**, because email scanners open links automatically.
+- Request links expire at `respond_by` (or once answered); other links after `ACTION_LINK_DAYS`. Actions go through the same transition whitelist, so a repeated tap is harmless.
+- Signed-in operators get the same actions in the portal.
+
+## Availability (what guests can request)
+A date + slot is **requestable** when all of these hold:
+1. The experience has an `experience_slots` row for that weekday and start time.
+2. The date is ≥ tomorrow (`MIN_LEAD_DAYS`) and not in `experience_blackouts` (whole day closed).
+3. No `slot_overrides` row sets capacity 0 for that date + slot. An override with a number replaces the weekly capacity for that date ("2 spots left").
+4. No `calendar_busy` event overlaps `[start_time, start_time + duration_minutes)` on that date (all-day events block the whole day).
+5. Confirmed + paid people for that date + slot + this group ≤ capacity.
+
+Show unavailable slots as "Full" rather than hiding them, so guests understand why.
+
+**Calendar import** (`operator_calendars`): the operator pastes a private iCal (.ics) address from Google, Outlook or Apple Calendar, for all experiences or one. `sync-calendars` fetches it every 15 minutes and replaces that calendar's `calendar_busy` rows for the next 12 months. Only event times are stored, never titles or descriptions (they may hold other people's details). Fetch safely: `https` only, block private/internal IP addresses (resolve the host first), 10 s timeout, 5 MB limit, no redirects to other hosts. After 3 failures in a row, email the operator and show a warning in the portal; keep the last good data.
+
+**Calendar export:** `GET /api/calendar/[feed_token].ics` lists the operator's `confirmed` and `paid` bookings (`requested`/`offered` as tentative) for the next 12 months: experience, time, reference, guest first name, group size, balance to collect. No guest phone or email. `feed_token` is random per operator and can be regenerated from the portal (old address stops working).
 
 ## 3. Guest pays deposit (Paystack)
 1. `/b/[token]/pay` (server): check status is `confirmed` and `pay_by` not passed.
@@ -73,6 +103,9 @@ One Supabase Cron job (pg_cron + pg_net, secret kept in Supabase Vault) runs eve
 | `expire-requests` | every 15 min | `requested` past `respond_by` → `expired`, strike, email guest alternatives |
 | `request-reminders` | every 15 min | Email operator when 3h left to respond |
 | `expire-payments` | every 15 min | `confirmed` past `pay_by` → `payment_expired`, email guest |
+| `expire-offers` | every 15 min | `offered` past `offer_expires_at` → `offer_expired`, email guest alternatives |
+| `sync-calendars` | every 15 min | Fetch each operator's imported calendar, refresh `calendar_busy` (see Availability) |
+| `weekly-availability` | Mondays 07:00 SAST | Email each operator their coming week with one-tap "this day is full" links |
 | `payment-reminders` | hourly | Email guest when 6h left to pay |
 | `day-before` | daily 08:00 SAST | Reminders to guests and operators for tomorrow's bookings |
 | `completion-reminders` | daily | Operators with unmarked past bookings; auto-complete after 7 days |
