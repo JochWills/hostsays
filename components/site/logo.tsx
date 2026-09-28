@@ -1,24 +1,21 @@
 import Link from "next/link";
 
-/** "HostSays" wordmark with the small mountain line above "Says". */
-export function Logo({ className = "" }: { className?: string }) {
+// The two halves of public/images/logo.png, used as masks so each can take a theme colour.
+// Both are 240px tall and line up exactly side by side.
+const HALF = "block h-full bg-current [mask-size:100%_100%] [mask-repeat:no-repeat]";
+
+/**
+ * HostSays logo: "Host" in ink, "Says" and the mountain in green.
+ * `onPhoto` makes it all white for use over photos (the green would disappear into the image).
+ */
+export function Logo({ onPhoto = false, className = "" }: { onPhoto?: boolean; className?: string }) {
   return (
-    <Link
-      href="/"
-      aria-label="HostSays home"
-      className={`flex items-end text-[28px] leading-none font-extrabold tracking-[-0.03em] sm:text-[34px] ${className}`}
-    >
-      Host
-      <span className="relative">
-        <svg
-          viewBox="0 0 46 16"
-          aria-hidden="true"
-          className="absolute -top-3 left-1 h-4 w-[46px] fill-none stroke-current stroke-[2.4] [stroke-linecap:round] [stroke-linejoin:round]"
-        >
-          <path d="M2 14l10-9 6 5 8-8 18 12" />
-        </svg>
-        Says
-      </span>
+    <Link href="/" aria-label="HostSays home" className={`flex h-[42px] shrink-0 sm:h-[50px] ${className}`}>
+      <span aria-hidden="true" className={`${HALF} aspect-[374/240] [mask-image:url(/images/logo-host.png)]`} />
+      <span
+        aria-hidden="true"
+        className={`${HALF} aspect-[375/240] [mask-image:url(/images/logo-says.png)] ${onPhoto ? "" : "text-green"}`}
+      />
     </Link>
   );
 }
