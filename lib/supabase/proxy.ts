@@ -21,6 +21,8 @@ export async function refreshSession(request: NextRequest): Promise<NextResponse
       },
     },
   );
-  await supabase.auth.getUser();
+  // Verifies the token locally with the project's public signing key (ES256) and only calls Supabase Auth
+  // when it needs refreshing, so most requests make no network call here.
+  await supabase.auth.getClaims();
   return response;
 }

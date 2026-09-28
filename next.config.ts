@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Photo uploads from the portals go through server actions (bucket limit is 5 MB, plus form overhead).
     serverActions: { bodySizeLimit: "6mb" },
+    // Keep visited dashboard pages for 30s so switching back and forth between tabs is instant.
+    // Saving anything (server actions call revalidatePath) clears this straight away.
+    staleTimes: { dynamic: 30 },
   },
   images: {
     // Photos come from the public Supabase Storage buckets.
