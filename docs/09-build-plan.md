@@ -35,7 +35,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [ ] Booking form host select, pre-filled and changeable
 
 ## Phase 4 — Booking engine
-- [ ] `lib/bookings/pricing.ts` (pure functions + unit tests for deposit/commission/rounding)
+- [ ] `lib/bookings/pricing.ts` (pure functions + unit tests for deposit/commission/rounding) — _functions written (used by the booking panel preview); no test runner or tests yet._
 - [ ] `lib/bookings/transitions.ts` (whitelisted state machine + tests)
 - [ ] Migration for offers and availability (see note in `05-data-model.md`): `offered`/`offer_expired`, `booking_offers`, `slot_overrides`, `operator_calendars`, `calendar_busy`, `calendar_feed_token`
 - [ ] `lib/bookings/availability.ts`: one function deciding if a date + slot is requestable (slots, blackouts, overrides, calendar busy, capacity) + tests
@@ -88,7 +88,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 ## Phase 10 — Launch readiness
 - [ ] Real legal pages (terms, operator agreement, privacy/POPIA, cancellation policy)
 - [ ] Paystack live keys, webhook URL registered, test a real R10 payment and refund
-- [ ] Resend domain verified (SPF/DKIM)
+- [x] Resend domain verified (SPF/DKIM) — hostsays.com verified; Supabase auth emails go through Resend SMTP
 - [ ] Error monitoring (e.g. Sentry) and basic analytics
 - [ ] Replace placeholder photos and demo operators with real, approved content
 - [ ] Mobile QA on real phones; accessibility check
