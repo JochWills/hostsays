@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Playfair_Display } from "next/font/google";
+import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -17,13 +18,20 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "HostSays — Things to do, recommended by local hosts",
     template: "%s · HostSays",
   },
   description:
     "Discover and book tours, safaris and ocean experiences on the Eastern Cape coast, recommended by the hosts you stay with.",
+  openGraph: {
+    siteName: "HostSays",
+    locale: "en_ZA",
+    type: "website",
+    images: [{ url: "/images/hero.jpg", width: 1186, height: 603, alt: "Game drive at golden hour" }],
+  },
+  robots: ALLOW_INDEXING ? { index: true, follow: true } : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

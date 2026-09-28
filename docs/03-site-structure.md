@@ -135,6 +135,7 @@ Changes by status:
 - `cancelled_*`: refund status
 
 ## SEO
+- **Indexing is off until launch.** `ALLOW_INDEXING=false` (Render env) makes `robots.txt` disallow everything and adds `noindex` to every page, because demo listings use real business names with placeholder prices. Set it to `true` when listings are real.
 - Server-render all public pages. Unique title/description per page.
 - `sitemap.xml` with areas, area+category pages, experiences, operators, verified host storefronts.
 - JSON-LD on experience pages (Product/Offer or TouristTrip) — keep it valid and simple.

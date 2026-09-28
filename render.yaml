@@ -19,6 +19,8 @@ services:
         value: "1"
       - key: NEXT_PUBLIC_SITE_URL
         sync: false # https://www.hostsays.com (Render redirects hostsays.com to www)
+      - key: ALLOW_INDEXING
+        value: "false" # set to true at launch, once listings are real
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY

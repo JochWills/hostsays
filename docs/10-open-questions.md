@@ -21,6 +21,8 @@ Don't guess these. Ask Josh, then move the answer into the right doc.
 - [ ] Before taking real bookings: stay on free Render/Supabase, or upgrade? (Free Render sleeps when idle; free Supabase pauses after ~a week of no activity.)
 
 ## Product
+- [ ] The heart (save) icon on cards: it currently saves to the guest's browser only, with no page to view saved items. Keep, add a "Saved" page, or remove?
+- [ ] Areas with hosts but no live experiences yet (e.g. Jeffreys Bay): their page shows hosts and "nothing listed yet". OK, or hide until something is live?
 - [ ] Support contact: email only, or also a phone/WhatsApp number?
 - [ ] Which areas go live first within the Eastern Cape coast?
 - [ ] Real photos: from operators, or licensed stock?

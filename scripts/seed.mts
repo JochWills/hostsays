@@ -61,8 +61,6 @@ const operatorPrivate = operators.map((o) => ({
   created_by_admin: true,
 }));
 
-const DEMO_NOTE = "Demo listing: details and prices are placeholders until the operator confirms them.";
-
 const experiences = [
   {
     id: EXP.safari, operator_id: OP.schotia, slug: "schotia-big-five-safari", title: "Schotia Big Five Safari",
@@ -162,7 +160,8 @@ async function main() {
     "experiences",
     experiences.map(({ photo, alt, slots, ...e }) => ({
       ...e,
-      description: `${e.summary}.\n\n${DEMO_NOTE}`,
+      // The page shows its own "demo listing" note for is_demo operators.
+      description: `${e.summary}.`,
       operator_cancellation_terms: null,
       status: "live",
     })),

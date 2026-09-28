@@ -18,15 +18,15 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 - [x] Typed Supabase client (`supabase gen types`) — `npm run db:types` → `lib/supabase/database.types.ts`
 
 ## Phase 2 — Public site
-- [ ] Homepage matching `reference/homepage-prototype.html` (pixel-close on desktop and mobile), data from DB
-- [ ] `/explore` with filters and sorting
-- [ ] `/[slug]` resolver: area page or host storefront (+ reserved slugs)
-- [ ] `/[area]/[category]` pages
-- [ ] `/x/[slug]` experience page (without booking submit yet)
-- [ ] `/o/[slug]` operator page
-- [ ] `/hosts` and `/areas` directory pages
-- [ ] Static pages: how-it-works, for-hosts, for-operators, about, help, legal placeholders
-- [ ] SEO: metadata, sitemap, robots, JSON-LD, OG images
+- [x] Homepage matching `reference/homepage-prototype.html` (pixel-close on desktop and mobile), data from DB
+- [x] `/explore` with filters and sorting
+- [x] `/[slug]` resolver: area page or host storefront (+ reserved slugs)
+- [x] `/[area]/[category]` pages
+- [x] `/x/[slug]` experience page (without booking submit yet)
+- [x] `/o/[slug]` operator page
+- [x] `/hosts` and `/areas` directory pages
+- [x] Static pages: how-it-works, for-hosts, for-operators, about, help, legal placeholders
+- [x] SEO: metadata, sitemap, robots, JSON-LD, OG images
 
 ## Phase 3 — Host attribution
 - [ ] Middleware sets `hs_host` session cookie from storefronts and `?ref=`

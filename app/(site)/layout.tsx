@@ -1,0 +1,13 @@
+import { Header } from "@/components/site/header";
+import { Footer } from "@/components/site/footer";
+
+/** Every public page except the homepage: solid header, content, footer. */
+export default function SiteLayout({ children }: LayoutProps<"/">) {
+  return (
+    <>
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </>
+  );
+}
