@@ -8,8 +8,6 @@ Don't guess these. Ask Josh, then move the answer into the right doc.
 - [ ] Same-day requests: allowed or not? (Currently minimum = tomorrow.)
 - [ ] Group-priced experiences (e.g. private charters): needed at launch?
 - [ ] Child pricing / age limits per experience?
-- [ ] "I'm flexible" on the request form (e.g. "any day Tue–Thu works"), so the operator can accept on whichever day suits? Not planned yet.
-- [ ] WhatsApp alerts to operators: keep for later, or bring forward to launch? (Meta's WhatsApp Business messages cost a few cents each and message templates need Meta approval.)
 
 ## Ask on the first operator calls
 - [ ] How do people book with you now (WhatsApp, phone, email, website, booking software — which one)?

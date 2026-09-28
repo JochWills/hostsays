@@ -111,7 +111,8 @@ No sync is perfect, so request-to-book and "Offer another time" stay as the safe
 - One review per booking.
 
 ## Notifications
-- **Email only** at launch (Resend). WhatsApp comes later.
+- **Email only** at launch (Resend). WhatsApp alerts come after launch (decided with Josh), using the same one-tap links.
+- No "I'm flexible" option on the request form (decided with Josh). Guests pick one date and time; "Offer another time" covers clashes.
 - Full list in `08-emails.md`.
 
 ## Legal and trust
