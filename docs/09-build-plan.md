@@ -70,7 +70,7 @@ Work through phases in order. Tick items as you go (`- [x]`). After each phase: 
 ## Phase 7 — Admin
 - [ ] Approvals (hosts, operators, listings, listing edits) — _hosts, operators and new listings done at `/admin/approvals` (listing review page at `/admin/experiences/[id]`); live listing edits still to do._
 - [ ] Create operator + experiences on behalf; send claim invite — _experiences on behalf done (`/admin/operators/[id]/new`); creating the operator itself and the claim invite still to do._
-- [x] Full edit of any host, operator and experience — `/admin/hosts/[id]`, `/admin/operators/[id]`, `/admin/experiences/[id]`: details, photos, times, closed dates, bank details, picks and tips, at any status (live edits show straight away). Admins can approve a draft directly once it has a photo and a weekly time.
+- [x] Full edit of any host, operator and experience — `/admin/hosts/[id]`, `/admin/operators/[id]`, `/admin/experiences/[id]`: details, photos, times, closed dates, bank details, picks and tips, at any status (live edits show straight away). Admins can approve a draft directly once it has a photo and a weekly time. Admins can also delete any host, operator or experience (with a confirm), unless bookings, payouts, reviews or strikes point at it; deleting a host or operator also deletes their sign-in accounts.
 - [ ] Bookings search + manual status override + refunds
 - [x] Hosts: verify, suspend, commission rate (0–10%), homepage position
 - [ ] Recommendations moderation — _hide/show, edit tip and delete per host done on `/admin/hosts/[id]`; a site-wide list still to do._

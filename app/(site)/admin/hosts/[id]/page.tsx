@@ -9,11 +9,13 @@ import { getAllAreas } from "@/lib/data/public";
 import { HOST_TYPES } from "@/lib/validation/auth";
 import { TIP_MAX_LENGTH } from "@/lib/config";
 import { publicImageUrl } from "@/lib/storage";
-import { adminRemovePick, adminSaveHost, adminSaveHostBank, adminSetPickHidden, adminUpdateTip, adminUploadHostPhoto } from "../../edit-actions";
+import { firstValues } from "@/lib/validation/explore";
+import { adminDeleteHost, adminRemovePick, adminSaveHost, adminSaveHostBank, adminSetPickHidden, adminUpdateTip, adminUploadHostPhoto } from "../../edit-actions";
 import { AccountActions } from "@/components/portal/admin-buttons";
 import { ActionForm, ConfirmButton, FileField, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
+import { DeleteZone } from "@/components/portal/delete-zone";
 import { Members } from "@/components/portal/members";
-import { PageHeading, StatusPill } from "@/components/portal/ui";
+import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
 import { btnSecondary, panel, sectionTitle } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Edit host", robots: { index: false, follow: false } };
@@ -22,8 +24,8 @@ const iconBtn = "grid size-9 cursor-pointer place-items-center rounded-[10px] te
 /** 0.06 → "6", 0.065 → "6.5" */
 const percent = (rate: number) => String(Math.round(rate * 10000) / 100);
 
-export default async function AdminHost({ params }: PageProps<"/admin/hosts/[id]">) {
-  const { id } = await params;
+export default async function AdminHost({ params, searchParams }: PageProps<"/admin/hosts/[id]">) {
+  const [{ id }, sp] = await Promise.all([params, searchParams.then(firstValues)]);
   await requireRole("admin", `/admin/hosts/${id}`);
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const [h, areas] = await Promise.all([getHostForAdmin(id), getAllAreas()]);
@@ -53,6 +55,7 @@ export default async function AdminHost({ params }: PageProps<"/admin/hosts/[id]
         actions={<AccountActions kind="host" id={h.id} name={h.name} status={h.status} />}
       />
 
+      {sp.error === "kept" && <Notice tone="warn">This host has bookings or payouts on record, so they can&rsquo;t be deleted. Suspend them instead.</Notice>}
       <Members members={members} />
 
       <section className={`${panel} mb-6`}>
@@ -181,6 +184,14 @@ export default async function AdminHost({ params }: PageProps<"/admin/hosts/[id]
           </Row>
         </ActionForm>
       </section>
+      <DeleteZone
+        action={adminDeleteHost}
+        id={h.id}
+        title="Delete this host"
+        body="Removes them for good: their storefront, picks, photo, bank details and their sign-in account. To take them off the site for now, use Suspend instead."
+        confirm={`Delete ${h.name} and their sign-in account for good? This can't be undone.`}
+        label="Delete host"
+      />
     </>
   );
 }

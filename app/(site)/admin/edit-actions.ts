@@ -257,14 +257,92 @@ export async function adminDeleteBlackout(form: FormData) {
   refreshAll();
 }
 
-/** Delete a listing that never went live (draft or sent back), with its photos. */
+// ---------- Deleting ----------
+// Bookings, payouts, reviews and strikes are money and history records, so anything they point at can't be
+// deleted: the page says to suspend or pause it instead. Photos are removed from storage too.
+
+type AdminDb = ReturnType<typeof createAdminClient>;
+const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
+
+/** Delete one experience with its photos (times, closed dates and picks go with it). False if records keep it. */
+async function deleteExperienceRow(db: AdminDb, id: string): Promise<boolean> {
+  const kept = (await Promise.all([
+    count(db.from("bookings").select("id", { count: "exact", head: true }).eq("experience_id", id)),
+    count(db.from("reviews").select("id", { count: "exact", head: true }).eq("experience_id", id)),
+  ])).some(Boolean);
+  if (kept) return false;
+  const { data: photos } = await db.from("experience_photos").select("path").eq("experience_id", id);
+  if (photos?.length) await db.storage.from("experience-photos").remove(photos.map((p) => p.path));
+  const { error } = await db.from("experiences").delete().eq("id", id);
+  if (error) throw new Error(`Couldn't delete experience: ${error.message}`);
+  return true;
+}
+
+/** Delete the sign-in accounts that belong only to this business (never admins or guests). */
+async function deleteMemberLogins(db: AdminDb, userIds: string[]) {
+  if (!userIds.length) return;
+  const { data: profiles } = await db.from("profiles").select("id, role").in("id", userIds);
+  for (const p of profiles ?? []) {
+    if (p.role !== "host" && p.role !== "operator") continue;
+    const [hosts, operators] = await Promise.all([
+      count(db.from("host_members").select("host_id", { count: "exact", head: true }).eq("user_id", p.id)),
+      count(db.from("operator_members").select("operator_id", { count: "exact", head: true }).eq("user_id", p.id)),
+    ]);
+    if (hosts + operators === 0) await db.auth.admin.deleteUser(p.id);
+  }
+}
+
 export async function adminDeleteExperience(form: FormData) {
   const db = await admin();
   const exp = await experience(db, form.get("id"));
-  if (!exp || (exp.status !== "draft" && exp.status !== "rejected")) return;
-  const { data: photos } = await db.from("experience_photos").select("path").eq("experience_id", exp.id);
-  if (photos?.length) await db.storage.from("experience-photos").remove(photos.map((p) => p.path));
-  await db.from("experiences").delete().eq("id", exp.id).in("status", ["draft", "rejected"]);
+  if (!exp) return;
+  if (!(await deleteExperienceRow(db, exp.id))) redirect(`/admin/experiences/${exp.id}?error=kept`);
   refreshAll();
-  redirect("/admin/experiences");
+  redirect(`/admin/experiences?deleted=${encodeURIComponent(exp.title)}`);
+}
+
+export async function adminDeleteOperator(form: FormData) {
+  const db = await admin();
+  const id = form.get("id");
+  if (!uuid(id)) return;
+  const operatorId = String(id);
+  const { data: op } = await db.from("operators").select("id, name, logo_path, operator_members(user_id)").eq("id", operatorId).maybeSingle();
+  if (!op) return;
+  const kept = (await Promise.all([
+    count(db.from("bookings").select("id", { count: "exact", head: true }).eq("operator_id", operatorId)),
+    count(db.from("operator_strikes").select("id", { count: "exact", head: true }).eq("operator_id", operatorId)),
+  ])).some(Boolean);
+  if (kept) redirect(`/admin/operators/${operatorId}?error=kept`);
+
+  const { data: exps } = await db.from("experiences").select("id").eq("operator_id", operatorId);
+  for (const e of exps ?? []) if (!(await deleteExperienceRow(db, e.id))) redirect(`/admin/operators/${operatorId}?error=kept`);
+  if (op.logo_path) await db.storage.from("operator-logos").remove([op.logo_path]).catch(() => null);
+  await db.from("invites").delete().eq("operator_id", operatorId);
+  const { error } = await db.from("operators").delete().eq("id", operatorId);
+  if (error) throw new Error(`Couldn't delete operator: ${error.message}`);
+  await deleteMemberLogins(db, op.operator_members.map((m) => m.user_id));
+  refreshAll();
+  redirect(`/admin/operators?deleted=${encodeURIComponent(op.name)}`);
+}
+
+export async function adminDeleteHost(form: FormData) {
+  const db = await admin();
+  const id = form.get("id");
+  if (!uuid(id)) return;
+  const hostId = String(id);
+  const { data: host } = await db.from("hosts").select("id, name, photo_path, host_members(user_id)").eq("id", hostId).maybeSingle();
+  if (!host) return;
+  const kept = (await Promise.all([
+    count(db.from("bookings").select("id", { count: "exact", head: true }).eq("host_id", hostId)),
+    count(db.from("payouts").select("id", { count: "exact", head: true }).eq("host_id", hostId)),
+  ])).some(Boolean);
+  if (kept) redirect(`/admin/hosts/${hostId}?error=kept`);
+
+  if (host.photo_path) await db.storage.from("host-photos").remove([host.photo_path]);
+  await db.from("invites").delete().eq("host_id", hostId);
+  const { error } = await db.from("hosts").delete().eq("id", hostId);
+  if (error) throw new Error(`Couldn't delete host: ${error.message}`);
+  await deleteMemberLogins(db, host.host_members.map((m) => m.user_id));
+  refreshAll();
+  redirect(`/admin/hosts?deleted=${encodeURIComponent(host.name)}`);
 }

@@ -5,7 +5,7 @@ import { getAllExperiencesForAdmin } from "@/lib/data/portal";
 import { formatRand } from "@/lib/format";
 import { firstValues } from "@/lib/validation/explore";
 import { ListingActions } from "@/components/portal/admin-buttons";
-import { PageHeading, StatusPill } from "@/components/portal/ui";
+import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
 import { btnSecondary, panel } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Experiences", robots: { index: false, follow: false } };
@@ -30,6 +30,7 @@ export default async function AdminExperiences({ searchParams }: PageProps<"/adm
   return (
     <>
       <PageHeading title="Experiences" intro={`${all.length} in total.`} />
+      {sp.deleted && <Notice>Deleted {sp.deleted}.</Notice>}
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <Link key={f.value} href={f.value ? `/admin/experiences?status=${f.value}` : "/admin/experiences"} className={chip(f.value === status)}>

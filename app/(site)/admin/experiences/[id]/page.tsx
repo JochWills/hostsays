@@ -19,9 +19,8 @@ import {
 } from "../../edit-actions";
 import { ListingActions } from "@/components/portal/admin-buttons";
 import { ExperienceEditor } from "@/components/portal/experience-editor";
-import { ConfirmButton } from "@/components/portal/form";
+import { DeleteZone } from "@/components/portal/delete-zone";
 import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
-import { btnSecondary } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Edit experience", robots: { index: false, follow: false } };
 
@@ -65,6 +64,7 @@ export default async function AdminExperience({ params, searchParams }: PageProp
 
       {sp.created && <Notice>Saved as a draft for {op?.name}. Add photos and weekly times, then approve it to put it live.</Notice>}
       {e.status === "live" && <Notice>This listing is live: anything you save here shows on the site straight away.</Notice>}
+      {sp.error === "kept" && <Notice tone="warn">This experience has bookings or reviews, so it can&rsquo;t be deleted. Pause it instead.</Notice>}
       {sp.error === "incomplete" && <Notice tone="warn">Add at least one photo and one weekly time before putting it live.</Notice>}
       {e.status === "draft" && <Notice>This is still a draft. The operator can keep editing it until they submit it for review.</Notice>}
 
@@ -83,14 +83,14 @@ export default async function AdminExperience({ params, searchParams }: PageProp
         }}
       />
 
-      {(e.status === "draft" || e.status === "rejected") && (
-        <form action={adminDeleteExperience} className="text-right">
-          <input type="hidden" name="id" value={e.id} />
-          <ConfirmButton message="Delete this listing and its photos? This can't be undone." className={`${btnSecondary} text-danger`}>
-            Delete this listing
-          </ConfirmButton>
-        </form>
-      )}
+      <DeleteZone
+        action={adminDeleteExperience}
+        id={e.id}
+        title="Delete this experience"
+        body="Removes it from the site for good, with its photos, times, closed dates and every host's pick of it. To take it off the site for now, use Pause instead."
+        confirm={`Delete "${e.title}" for good? Its photos, times and host picks go too. This can't be undone.`}
+        label="Delete experience"
+      />
     </>
   );
 }

@@ -6,22 +6,26 @@ import { requireRole } from "@/lib/auth";
 import { getMemberLogins, getOperatorForAdmin } from "@/lib/data/portal";
 import { getAllAreas } from "@/lib/data/public";
 import { formatRand } from "@/lib/format";
-import { adminSaveOperator } from "../../edit-actions";
+import { firstValues } from "@/lib/validation/explore";
+import { adminDeleteOperator, adminSaveOperator } from "../../edit-actions";
 import { AccountActions } from "@/components/portal/admin-buttons";
 import { ActionForm, CheckboxField, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
+import { DeleteZone } from "@/components/portal/delete-zone";
 import { Members } from "@/components/portal/members";
-import { PageHeading, StatusPill } from "@/components/portal/ui";
+import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
 import { btnSecondary, panel, sectionTitle } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Edit operator", robots: { index: false, follow: false } };
 
-export default async function AdminOperator({ params }: PageProps<"/admin/operators/[id]">) {
-  const { id } = await params;
+export default async function AdminOperator({ params, searchParams }: PageProps<"/admin/operators/[id]">) {
+  const [{ id }, sp] = await Promise.all([params, searchParams.then(firstValues)]);
   await requireRole("admin", `/admin/operators/${id}`);
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const [o, areas] = await Promise.all([getOperatorForAdmin(id), getAllAreas()]);
   if (!o) notFound();
   const members = await getMemberLogins(o.operator_members);
+  const n = o.experiences.length;
+  const theirExperiences = n === 0 ? "no experiences" : n === 1 ? "their 1 experience" : `all ${n} of their experiences`;
   const priv = o.operator_private;
   const agreed = priv?.terms_accepted_at
     ? new Date(priv.terms_accepted_at).toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Johannesburg" })
@@ -49,6 +53,7 @@ export default async function AdminOperator({ params }: PageProps<"/admin/operat
         actions={<AccountActions kind="operator" id={o.id} name={o.name} status={o.status} />}
       />
 
+      {sp.error === "kept" && <Notice tone="warn">This operator has bookings or strikes on record, so they can&rsquo;t be deleted. Suspend them instead.</Notice>}
       <Members members={members} />
 
       <section className={`${panel} mb-6`}>
@@ -97,6 +102,14 @@ export default async function AdminOperator({ params }: PageProps<"/admin/operat
           </ul>
         )}
       </section>
+      <DeleteZone
+        action={adminDeleteOperator}
+        id={o.id}
+        title="Delete this operator"
+        body={`Removes them for good: their page, ${theirExperiences} (with photos and host picks) and their sign-in account. To take them off the site for now, use Suspend instead.`}
+        confirm={`Delete ${o.name}, ${theirExperiences} and their sign-in account for good? This can't be undone.`}
+        label="Delete operator"
+      />
     </>
   );
 }
