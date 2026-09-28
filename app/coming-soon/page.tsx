@@ -19,7 +19,7 @@ export default function ComingSoon() {
       />
       <div className="wrap relative flex flex-1 flex-col">
         <header className="pt-[26px] sm:pt-8">
-          <Logo onPhoto />
+          <Logo />
         </header>
 
         <main className="max-w-[720px] flex-1 pt-14 sm:pt-[90px]">
