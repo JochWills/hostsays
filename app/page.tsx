@@ -23,10 +23,10 @@ export default async function Home() {
 
   return (
     <>
-      <header className="relative overflow-hidden bg-hero bg-[url(/images/hero.jpg)] bg-size-[auto_100%] bg-position-[70%_30%] bg-no-repeat text-white md:bg-right">
+      <header className="relative overflow-hidden bg-hero bg-[url(/images/hero.png)] bg-cover bg-position-[78%_center] bg-no-repeat text-white md:bg-position-[right_center]">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(90deg,#2c1f11_0%,rgba(44,31,17,.85)_32%,rgba(44,31,17,.45)_50%,rgba(44,31,17,.1)_66%,rgba(0,0,0,0)_80%),linear-gradient(180deg,rgba(0,0,0,.28)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_70%,rgba(0,0,0,.28)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.35)_0%,rgba(0,0,0,.15)_40%,rgba(0,0,0,0)_60%),linear-gradient(180deg,rgba(0,0,0,.28)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_70%,rgba(0,0,0,.28)_100%)]"
         />
         <div className="wrap-hero relative">
           <Header variant="overlay" />
