@@ -77,6 +77,23 @@
     overflow-x: hidden;
   }
 
+  /* Tailwind v4 leaves buttons with the arrow cursor; everything clickable gets the hand. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"]:not([aria-disabled="true"]),
+  summary,
+  label:has(> input[type="checkbox"]:not(:disabled)),
+  label:has(> input[type="radio"]:not(:disabled)),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled)::file-selector-button {
+    cursor: pointer;
+  }
+  button:disabled,
+  button[aria-disabled="true"] {
+    cursor: default;
+  }
+
   :focus-visible {
     outline: 3px solid var(--gold);
     outline-offset: 2px;
