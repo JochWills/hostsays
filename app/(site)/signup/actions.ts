@@ -14,7 +14,7 @@ export type SignupState = {
   values?: Record<string, string>;
 };
 
-const FIELDS = ["type", "fullName", "name", "hostType", "areaId", "listingUrl", "website", "phone", "email"] as const;
+const FIELDS = ["type", "fullName", "name", "hostType", "areaId", "town", "listingUrl", "website", "phone", "email"] as const;
 
 export async function signUp(_prev: SignupState, form: FormData): Promise<SignupState> {
   const values = Object.fromEntries(FIELDS.map((f) => [f, String(form.get(f) ?? "")]));

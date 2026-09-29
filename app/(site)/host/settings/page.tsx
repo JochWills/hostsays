@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { requireHost } from "@/lib/portal";
 import { getHostSettings } from "@/lib/data/portal";
-import { getAllAreas } from "@/lib/data/public";
+import { getAreaChoices } from "@/lib/data/public";
 import { HOST_TYPES } from "@/lib/validation/auth";
 import { saveBankDetails, saveHostDetails } from "../actions";
 import { AccountSettings } from "@/components/portal/account-settings";
-import { ActionForm, CheckboxField, Row, SelectField, TextField } from "@/components/portal/form";
+import { ActionForm, AreaField, CheckboxField, Row, SelectField, TextField } from "@/components/portal/form";
 import { PageHeading } from "@/components/portal/ui";
 import { panel, sectionTitle } from "@/components/ui/styles";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Settings", robots: { index: false, f
 
 export default async function HostSettings() {
   const { user, host } = await requireHost("/host/settings");
-  const [s, areas] = await Promise.all([getHostSettings(host.id), getAllAreas()]);
+  const [s, provinces] = await Promise.all([getHostSettings(host.id), getAreaChoices()]);
 
   return (
     <>
@@ -25,10 +25,8 @@ export default async function HostSettings() {
         </p>
         <ActionForm action={saveHostDetails} submitLabel="Save">
           <TextField name="name" label="Property name" defaultValue={s.name} />
-          <Row>
-            <SelectField name="hostType" label="Type of place" options={HOST_TYPES} defaultValue={s.type} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={s.area_id} />
-          </Row>
+          <SelectField name="hostType" label="Type of place" options={HOST_TYPES} defaultValue={s.type} />
+          <AreaField provinces={provinces} areaId={s.area_id} requestedProvinceId={s.requested_province_id} requestedTown={s.requested_town} />
           <Row>
             <TextField name="contactEmail" label="Contact email" type="email" defaultValue={s.contact_email} hint="For HostSays to reach you. Not shown on the site." />
             <TextField name="contactPhone" label="Contact phone (WhatsApp)" type="tel" defaultValue={s.contact_phone} />

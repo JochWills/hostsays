@@ -88,7 +88,10 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
   const count = `${results.length} ${results.length === 1 ? "experience" : "experiences"}`;
 
   const filterProps: FilterProps = {
-    provinces: provinces.map((p) => ({ slug: p.slug, name: p.name, areas: p.areas.map((a) => ({ slug: a.slug, name: a.name })) })),
+    // Provinces with something to show (plus the one being viewed, even if it's empty).
+    provinces: provinces
+      .filter((p) => p.areas.length || p.slug === place?.slug)
+      .map((p) => ({ slug: p.slug, name: p.name, areas: p.areas.map((a) => ({ slug: a.slug, name: a.name })) })),
     areaSlug: place?.slug,
     category,
     date: params.date,

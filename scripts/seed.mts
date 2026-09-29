@@ -32,17 +32,17 @@ const EXP = { safari: id("c", 1), seals: id("c", 2), horses: id("c", 3), wine: i
 const HOST = { sundays: id("d", 1), kenton: id("d", 2), onthebay: id("d", 3), aloe: id("d", 4) };
 
 const areas = [
-  { id: AREA.gqeberha, slug: "gqeberha", name: "Gqeberha", sort_order: 1, is_live: true,
+  { id: AREA.gqeberha, slug: "gqeberha", name: "Gqeberha", sort_order: 1,
     intro: "Ask any host in Summerstrand and they'll say the same thing: get on the water. Algoa Bay is right on the doorstep." },
-  { id: AREA.addo, slug: "addo", name: "Addo", sort_order: 2, is_live: true,
-    intro: "Elephant country. Hosts around Addo and the Sundays River Valley know which drives and trails are worth your morning." },
-  { id: AREA.jbay, slug: "jeffreys-bay", name: "Jeffreys Bay", sort_order: 3, is_live: false,
+  { id: AREA.addo, slug: "sundays-river-valley", name: "Sundays River Valley", sort_order: 2,
+    intro: "Elephant country, with Addo Elephant National Park on the doorstep. Hosts in the Sundays River Valley know which drives and trails are worth your morning." },
+  { id: AREA.jbay, slug: "jeffreys-bay", name: "Jeffreys Bay", sort_order: 3,
     intro: "Surf town with a slow pace. Local hosts share where to go when you're not in the water." },
-  { id: AREA.stfrancis, slug: "st-francis-bay", name: "St Francis Bay", sort_order: 4, is_live: false,
+  { id: AREA.stfrancis, slug: "st-francis-bay", name: "St Francis Bay", sort_order: 4,
     intro: "Canals, beaches and quiet coastal walks, picked by the people who live here." },
-  { id: AREA.kenton, slug: "kenton-on-sea", name: "Kenton-on-Sea", sort_order: 5, is_live: true,
+  { id: AREA.kenton, slug: "kenton-on-sea", name: "Kenton-on-Sea", sort_order: 5,
     intro: "Between two rivers and the sea. Hosts in Kenton know the best spots for a long, lazy afternoon." },
-  { id: AREA.portalfred, slug: "port-alfred", name: "Port Alfred", sort_order: 6, is_live: false,
+  { id: AREA.portalfred, slug: "port-alfred", name: "Port Alfred", sort_order: 6,
     intro: "A river town on the Sunshine Coast, with local favourites on the Kowie and along the beach." },
 ];
 

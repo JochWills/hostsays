@@ -30,6 +30,16 @@ const rands = z
   .pipe(z.number().int().min(100, "The price must be at least R1"));
 const int = (min: number, max: number, message: string) => z.coerce.number(message).int(message).min(min, message).max(max, message);
 
+/**
+ * "Which area?" in settings: an area id, "other:<province id>" with a town, or "" to leave it as it is
+ * (someone still waiting for their town to be added). See lib/area-choice.ts.
+ */
+const areaField = z.union([z.literal(""), z.string().regex(/^(other:)?[0-9a-f-]{36}$/i, "Choose your area")]);
+const townField = z.string().trim().max(60, "Keep the town name short").optional().default("");
+function checkTown(v: { areaId: string; town: string }, ctx: z.RefinementCtx) {
+  if (v.areaId.startsWith("other:") && v.town.length < 2) ctx.addIssue({ code: "custom", path: ["town"], message: "Enter your town" });
+}
+
 // ---------- Your login ----------
 export const profileUpdate = z.object({ fullName: text(2, 80, "Enter your name"), phone: optionalPhone });
 export const passwordUpdate = z
@@ -40,14 +50,16 @@ export const passwordUpdate = z
   .refine((v) => v.password === v.confirm, { path: ["confirm"], message: "The passwords don't match" });
 
 // ---------- Operator ----------
-export const operatorDetails = z.object({
+const operatorFields = z.object({
   name: text(2, 80, "Enter your business name"),
-  areaId: z.uuid("Choose your area"),
+  areaId: areaField,
+  town: townField,
   description: optionalText(1500, "Keep this under 1,500 characters"),
   website: webAddress,
   contactEmail: email,
   contactPhone: optionalPhone,
 });
+export const operatorDetails = operatorFields.superRefine(checkTown);
 
 export const experienceDetails = z
   .object({
@@ -81,13 +93,15 @@ export const blackoutInput = z.object({
 });
 
 // ---------- Host ----------
-export const hostDetails = z.object({
+const hostFields = z.object({
   name: text(2, 80, "Enter your property's name"),
   hostType: z.enum(HOST_TYPES.map((t) => t.value) as [string, ...string[]], "Choose the type of place"),
-  areaId: z.uuid("Choose your area"),
+  areaId: areaField,
+  town: townField,
   contactEmail: email,
   contactPhone: optionalPhone,
 });
+export const hostDetails = hostFields.superRefine(checkTown);
 
 export const storefrontInput = z.object({
   welcomeNote: optionalText(600, "Keep your welcome note under 600 characters"),
@@ -103,7 +117,7 @@ export const bankInput = z.object({
 // ---------- Admin (extra fields only the HostSays team can change) ----------
 const checkbox = z.literal("on").optional().transform((v) => v === "on");
 
-export const adminHostDetails = hostDetails.extend({
+export const adminHostDetails = hostFields.extend({
   listingUrl: webAddress.refine((v) => v !== "", "Add the link to their listing"),
   /** "6" or "6,5" (percent) → 0.06 / 0.065. The database allows 0–10%. */
   commissionPercent: z
@@ -117,9 +131,20 @@ export const adminHostDetails = hostDetails.extend({
   /** Position in the homepage "Hosts who know the area" row; blank = not featured. */
   featuredRank: z.union([z.literal("").transform(() => null), int(1, 99, "Enter a position from 1, or leave it blank")]),
   welcomeNote: optionalText(600, "Keep the welcome note under 600 characters"),
-});
+}).superRefine(checkTown);
 
-export const adminOperatorDetails = operatorDetails.extend({ isDemo: checkbox });
+export const adminOperatorDetails = operatorFields.extend({ isDemo: checkbox }).superRefine(checkTown);
+
+/** An area (a town or well-known region travellers search for). The address is made from the name if left blank. */
+export const areaInput = z.object({
+  name: text(2, 40, "Enter the area's name (2–40 characters)"),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.union([z.literal(""), z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use lowercase letters, numbers and dashes, e.g. port-alfred").min(2).max(40)])),
+  intro: optionalText(300, "Keep the intro under 300 characters"),
+});
 
 export const tipInput = z.object({
   tip: text(1, TIP_MAX_LENGTH, `Write a short tip (up to ${TIP_MAX_LENGTH} characters)`),

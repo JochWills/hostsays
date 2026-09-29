@@ -22,10 +22,10 @@ export default async function Home() {
     getLiveAreas(),
     getProvinces(),
   ]);
-  // "Where are you going?": anywhere, then each province with its live towns.
+  // "Where are you going?": anywhere, then each province that has something to show, with its areas.
   const places = [
     { value: "", label: "Anywhere" },
-    ...provinces.flatMap((p) => [
+    ...provinces.filter((p) => p.areas.length).flatMap((p) => [
       { value: p.slug, label: `All of ${provinceInSentence(p.name)}`, group: p.name },
       ...p.areas.map((a) => ({ value: a.slug, label: a.name, group: p.name })),
     ]),

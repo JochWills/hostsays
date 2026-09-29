@@ -1,13 +1,14 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { signUp, type SignupState } from "./actions";
 import { HOST_TYPES, type AccountType } from "@/lib/validation/auth";
 import { btnPrimary, input, label, panel } from "@/components/ui/styles";
 import { Dropdown } from "@/components/ui/dropdown";
+import { areaOptions, isSomewhereElse, type AreaChoiceProvince } from "@/lib/area-options";
 
-type Props = { type: AccountType; areas: { id: string; name: string; province: string }[] };
+type Props = { type: AccountType; provinces: AreaChoiceProvince[] };
 
 const TERMS: Record<AccountType, React.ReactNode> = {
   guest: (
@@ -37,11 +38,12 @@ function TermsLink({ href, children }: { href: string; children: React.ReactNode
   );
 }
 
-export function SignupForm({ type, areas }: Props) {
+export function SignupForm({ type, provinces }: Props) {
   const [state, action, pending] = useActionState<SignupState, FormData>(signUp, {});
   const errors = state.errors ?? {};
   const values = state.values ?? {};
   const formRef = useRef<HTMLFormElement>(null);
+  const [areaChoice, setAreaChoice] = useState(values.areaId ?? "");
 
   // After a failed submit, bring the first problem into view (on a phone it can be far above the button).
   useEffect(() => {
@@ -69,20 +71,33 @@ export function SignupForm({ type, areas }: Props) {
   const a11y = (name: string) =>
     errors[name] ? { "aria-invalid": true, "aria-describedby": `${name}-error` } : {};
 
-  const areaSelect = field(
-    "areaId",
-    "Area",
-    <Dropdown
-      key={values.areaId}
-      id="areaId"
-      name="areaId"
-      labelledBy="areaId-label"
-      placeholder="Choose your area"
-      defaultValue={values.areaId ?? ""}
-      options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))}
-      invalid={Boolean(errors.areaId)}
-      describedBy={errors.areaId ? "areaId-error" : undefined}
-    />,
+  const areaSelect = (
+    <>
+      {field(
+        "areaId",
+        "Area",
+        <Dropdown
+          key={values.areaId}
+          id="areaId"
+          name="areaId"
+          labelledBy="areaId-label"
+          placeholder="Choose your area"
+          defaultValue={values.areaId ?? ""}
+          onChange={setAreaChoice}
+          options={areaOptions(provinces, { somewhereElse: true })}
+          invalid={Boolean(errors.areaId)}
+          describedBy={errors.areaId ? "areaId-error" : undefined}
+        />,
+        "Not listed? Choose “Somewhere else” under your province.",
+      )}
+      {isSomewhereElse(areaChoice) &&
+        field(
+          "town",
+          "Your town",
+          <input id="town" name="town" required autoComplete="address-level2" defaultValue={values.town} className={input} {...a11y("town")} />,
+          "We'll add it to HostSays when we check your details.",
+        )}
+    </>
   );
   const phoneField = field(
     "phone",

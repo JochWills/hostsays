@@ -5,14 +5,14 @@ import { notFound } from "next/navigation";
 import { Eye, EyeOff, ExternalLink, Trash2, UserRound } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { getHostForAdmin, getMemberLogins } from "@/lib/data/portal";
-import { getAllAreas } from "@/lib/data/public";
+import { getAreaChoices } from "@/lib/data/public";
 import { HOST_TYPES } from "@/lib/validation/auth";
 import { TIP_MAX_LENGTH } from "@/lib/config";
 import { publicImageUrl } from "@/lib/storage";
 import { firstValues } from "@/lib/validation/explore";
 import { adminDeleteHost, adminRemovePick, adminSaveHost, adminSaveHostBank, adminSetPickHidden, adminUpdateTip, adminUploadHostPhoto } from "../../edit-actions";
 import { AccountActions } from "@/components/portal/admin-buttons";
-import { ActionForm, ConfirmButton, FileField, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
+import { ActionForm, AreaField, ConfirmButton, FileField, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
 import { DeleteZone } from "@/components/portal/delete-zone";
 import { Members } from "@/components/portal/members";
 import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
@@ -28,7 +28,7 @@ export default async function AdminHost({ params, searchParams }: PageProps<"/ad
   const [{ id }, sp] = await Promise.all([params, searchParams.then(firstValues)]);
   await requireRole("admin", `/admin/hosts/${id}`);
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const [h, areas] = await Promise.all([getHostForAdmin(id), getAllAreas()]);
+  const [h, provinces] = await Promise.all([getHostForAdmin(id), getAreaChoices()]);
   if (!h) notFound();
   const members = await getMemberLogins(h.host_members);
   const priv = h.host_private;
@@ -65,10 +65,8 @@ export default async function AdminHost({ params, searchParams }: PageProps<"/ad
         </p>
         <ActionForm action={adminSaveHost.bind(null, h.id)} submitLabel="Save">
           <TextField name="name" label="Property name" defaultValue={h.name} />
-          <Row>
-            <SelectField name="hostType" label="Type of place" options={HOST_TYPES} defaultValue={h.type} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={h.area_id} />
-          </Row>
+          <SelectField name="hostType" label="Type of place" options={HOST_TYPES} defaultValue={h.type} />
+          <AreaField provinces={provinces} areaId={h.area_id} requestedProvinceId={priv?.requested_province_id} requestedTown={priv?.requested_town} />
           <TextField name="listingUrl" label="Listing used to verify them" inputMode="url" defaultValue={priv?.listing_url} hint="Their Booking.com, Airbnb or own website page." />
           <Row>
             <TextField name="contactEmail" label="Contact email" type="email" defaultValue={priv?.contact_email} />

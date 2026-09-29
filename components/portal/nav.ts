@@ -27,6 +27,7 @@ export const PORTAL_NAV: Record<Role, NavItem[]> = {
     { href: "/admin/experiences", label: "Experiences" },
     { href: "/admin/operators", label: "Operators" },
     { href: "/admin/hosts", label: "Hosts" },
+    { href: "/admin/areas", label: "Areas" },
     { href: "/admin/bookings", label: "Bookings" },
     { href: "/admin/payouts", label: "Payouts" },
     { href: "/admin/settings", label: "Settings" },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { MapPin } from "lucide-react";
 import { ExperienceCard, ExperienceGrid } from "@/components/cards/experience-card";
 import { HostGrid } from "@/components/cards/host-card";
@@ -34,7 +34,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const found = await resolveTopLevelSlug(slug);
-  if (!found) return {};
+  if (!found || found.kind === "redirect") return {};
   if (found.kind === "area") {
     const { area } = found;
     return {
@@ -64,6 +64,7 @@ export default async function TopLevelPage({ params }: PageProps<"/[slug]">) {
   const { slug } = await params;
   const found = await resolveTopLevelSlug(slug);
   if (!found) notFound();
+  if (found.kind === "redirect") permanentRedirect(`/${found.to}`);
   if (found.kind === "area") return <AreaPage area={found.area} />;
   if (found.kind === "province") return <ProvincePage province={found.province} />;
   return <Storefront host={found.host} />;

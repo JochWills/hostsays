@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { requireOperator } from "@/lib/portal";
 import { getOperatorSettings } from "@/lib/data/portal";
-import { getAllAreas } from "@/lib/data/public";
+import { getAreaChoices } from "@/lib/data/public";
 import { saveOperatorDetails } from "../actions";
 import { AccountSettings } from "@/components/portal/account-settings";
-import { ActionForm, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
+import { ActionForm, AreaField, Row, TextArea, TextField } from "@/components/portal/form";
 import { PageHeading } from "@/components/portal/ui";
 import { panel, sectionTitle } from "@/components/ui/styles";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Settings", robots: { index: false, f
 
 export default async function OperatorSettings() {
   const { user, operator } = await requireOperator("/operator/settings");
-  const [s, areas] = await Promise.all([getOperatorSettings(operator.id), getAllAreas()]);
+  const [s, provinces] = await Promise.all([getOperatorSettings(operator.id), getAreaChoices()]);
   const agreed = s.terms_accepted_at
     ? new Date(s.terms_accepted_at).toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Johannesburg" })
     : null;
@@ -24,10 +24,8 @@ export default async function OperatorSettings() {
         <h2 className={sectionTitle}>Your business</h2>
         <p className="mt-1 mb-4 text-[14px] text-muted">Your name, area, description and website show on your operator page.</p>
         <ActionForm action={saveOperatorDetails} submitLabel="Save">
-          <Row>
-            <TextField name="name" label="Business name" defaultValue={s.name} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={s.area_id} />
-          </Row>
+          <TextField name="name" label="Business name" defaultValue={s.name} />
+          <AreaField provinces={provinces} areaId={s.area_id} requestedProvinceId={s.requested_province_id} requestedTown={s.requested_town} />
           <TextArea name="description" label="About your business" rows={5} defaultValue={s.description} hint="Who you are and what you do, in a few friendly sentences." />
           <TextField name="website" label="Website or social page" inputMode="url" defaultValue={s.website} />
           <Row>

@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { ExternalLink, Plus } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { getMemberLogins, getOperatorForAdmin } from "@/lib/data/portal";
-import { getAllAreas } from "@/lib/data/public";
+import { getAreaChoices } from "@/lib/data/public";
 import { formatRand } from "@/lib/format";
 import { firstValues } from "@/lib/validation/explore";
 import { adminDeleteOperator, adminSaveOperator } from "../../edit-actions";
 import { AccountActions } from "@/components/portal/admin-buttons";
-import { ActionForm, CheckboxField, Row, SelectField, TextArea, TextField } from "@/components/portal/form";
+import { ActionForm, AreaField, CheckboxField, Row, TextArea, TextField } from "@/components/portal/form";
 import { DeleteZone } from "@/components/portal/delete-zone";
 import { Members } from "@/components/portal/members";
 import { Notice, PageHeading, StatusPill } from "@/components/portal/ui";
@@ -21,7 +21,7 @@ export default async function AdminOperator({ params, searchParams }: PageProps<
   const [{ id }, sp] = await Promise.all([params, searchParams.then(firstValues)]);
   await requireRole("admin", `/admin/operators/${id}`);
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const [o, areas] = await Promise.all([getOperatorForAdmin(id), getAllAreas()]);
+  const [o, provinces] = await Promise.all([getOperatorForAdmin(id), getAreaChoices()]);
   if (!o) notFound();
   const members = await getMemberLogins(o.operator_members);
   const n = o.experiences.length;
@@ -62,10 +62,8 @@ export default async function AdminOperator({ params, searchParams }: PageProps<
           Name, area, description and website show on their page. Changes show on the site straight away.
         </p>
         <ActionForm action={adminSaveOperator.bind(null, o.id)} submitLabel="Save">
-          <Row>
-            <TextField name="name" label="Business name" defaultValue={o.name} />
-            <SelectField name="areaId" label="Area" options={areas.map((a) => ({ value: a.id, label: a.name, group: a.province }))} defaultValue={o.area_id} />
-          </Row>
+          <TextField name="name" label="Business name" defaultValue={o.name} />
+          <AreaField provinces={provinces} areaId={o.area_id} requestedProvinceId={priv?.requested_province_id} requestedTown={priv?.requested_town} />
           <TextArea name="description" label="About the business" rows={5} defaultValue={o.description} />
           <TextField name="website" label="Website or social page" inputMode="url" defaultValue={o.website} />
           <Row>

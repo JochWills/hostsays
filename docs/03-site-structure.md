@@ -13,7 +13,7 @@
 | `/o/[operator-slug]` | Operator page | All of an operator's experiences |
 | `/how-it-works` | Guest explainer | Request → confirm → deposit → go |
 | `/hosts` | Hosts directory | All verified hosts, filter by area; cards link to storefronts |
-| `/areas` | "Where to go" | All 9 provinces (decided with Josh), each with its live towns; provinces with nothing yet say "Coming soon" |
+| `/areas` | "Where to go" | Provinces with live areas in full; the rest on one "Coming soon" line with join links |
 | `/for-hosts` | For hosts | Pitch + apply form |
 | `/for-operators` | For operators | Pitch + apply form |
 | `/about` | About | Story, trust, commission disclosure |
@@ -82,13 +82,15 @@ Every portal also has a settings page with **Your details** (name, phone) and **
 | `/admin/hosts/[id]` | Edit any host: details, listing link, contact, commission rate, homepage position, welcome note, photo, bank details, picks (edit tip, hide, delete) |
 | `/admin/recommendations` | Moderate recommendations and tips |
 | `/admin/payouts` | Monthly payout run, CSV export, mark paid |
-| `/admin/content` | Areas, categories, homepage featured items |
+| `/admin/areas` | Areas per province: add, edit (name, address, intro), reorder, merge, delete unused; settle "Somewhere else" town requests |
+| `/admin/content` | Categories, homepage featured items |
 
 ## Slug resolution for `/[slug]`
-Provinces, areas (towns) and hosts share the top-level namespace. **Areas sit inside provinces** (Eastern Cape → Gqeberha, Addo, …; decided with Josh). A province page (`/eastern-cape`) shows its towns, its experiences and hosts, or a "Coming soon" invitation to join. `/explore?area=` accepts a town or a province slug.
+Provinces, areas (towns) and hosts share the top-level namespace. **Areas sit inside provinces** (Eastern Cape → Gqeberha, Sundays River Valley, …; decided with Josh). An area is a place travellers know (a town or region like "Sundays River Valley"), not a municipality, and it shows on the site by itself once it has something live. A province page (`/eastern-cape`) shows its towns, its experiences and hosts, or a "Coming soon" invitation to join. `/explore?area=` accepts a town or a province slug.
 1. Look up `areas.slug`, then `provinces.slug`. If found → render the area or province page.
 2. Else look up `hosts.slug` where `status = 'verified'`. If found → render host storefront **and set session attribution** (see `07-host-attribution.md`).
-3. Else 404.
+3. Else look up `area_redirects.old_slug` (renamed or merged areas, e.g. `/addo`). If found → 301 to the area (also for `/[old]/[category]`).
+4. Else 404.
 
 **Reserved slugs** (block for hosts and areas): `explore, x, o, b, r, host, hosts, areas, for-hosts, for-operators, operator, operators, admin, login, signup, sign-up, join, auth, invite, about, help, terms, privacy, cancellations, operator-terms, how-it-works, api, search, book, bookings, account, settings, static, images, favicon.ico, robots.txt, sitemap.xml, coming-soon, preview`.
 When a host picks a slug, also block any existing area or province slug and validate: lowercase letters, numbers and hyphens, 3–40 characters.

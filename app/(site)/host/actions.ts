@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { areaChoiceColumns } from "@/lib/area-choice";
 import { replaceHostPhoto } from "@/lib/host-edit";
 import { requireHost } from "@/lib/portal";
 import { createClient } from "@/lib/supabase/server";
@@ -28,17 +29,22 @@ export async function saveHostDetails(_prev: FormState, form: FormData): Promise
   const parsed = hostDetails.safeParse({
     name: form.get("name"),
     hostType: form.get("hostType"),
-    areaId: form.get("areaId"),
+    areaId: form.get("areaId") ?? "",
+    town: form.get("town") ?? "",
     contactEmail: form.get("contactEmail"),
     contactPhone: form.get("contactPhone"),
   });
   if (!parsed.success) return invalid(parsed.error, form);
   const d = parsed.data;
+  const place = areaChoiceColumns(d.areaId, d.town);
 
   const db = await createClient();
   const [a, b] = await Promise.all([
-    db.from("hosts").update({ name: d.name, type: d.hostType as Enum<"host_type">, area_id: d.areaId }).eq("id", host.id),
-    db.from("host_private").update({ contact_email: d.contactEmail, contact_phone: d.contactPhone || null }).eq("host_id", host.id),
+    db.from("hosts").update({ name: d.name, type: d.hostType as Enum<"host_type">, ...place?.area }).eq("id", host.id),
+    db
+      .from("host_private")
+      .update({ contact_email: d.contactEmail, contact_phone: d.contactPhone || null, ...place?.request })
+      .eq("host_id", host.id),
   ]);
   if (a.error || b.error) return SAVE_FAILED;
   await refresh();

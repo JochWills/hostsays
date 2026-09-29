@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formValues, invalid, type FormState } from "@/lib/form-state";
 import * as edit from "@/lib/experience-edit";
 import { replaceHostPhoto } from "@/lib/host-edit";
+import { areaChoiceColumns } from "@/lib/area-choice";
 import { adminHostDetails, adminOperatorDetails, bankInput, tipInput } from "@/lib/validation/portal";
 import type { Enum } from "@/lib/supabase/types";
 
@@ -38,7 +39,8 @@ export async function adminSaveHost(hostId: string, _prev: FormState, form: Form
   const parsed = adminHostDetails.safeParse({
     name: form.get("name"),
     hostType: form.get("hostType"),
-    areaId: form.get("areaId"),
+    areaId: form.get("areaId") ?? "",
+    town: form.get("town") ?? "",
     contactEmail: form.get("contactEmail"),
     contactPhone: form.get("contactPhone"),
     listingUrl: form.get("listingUrl"),
@@ -48,11 +50,12 @@ export async function adminSaveHost(hostId: string, _prev: FormState, form: Form
   });
   if (!parsed.success) return invalid(parsed.error, form);
   const d = parsed.data;
+  const place = areaChoiceColumns(d.areaId, d.town);
 
   const [a, b] = await Promise.all([
     db
       .from("hosts")
-      .update({ name: d.name, type: d.hostType as Enum<"host_type">, area_id: d.areaId, featured_rank: d.featuredRank, welcome_note: d.welcomeNote || null })
+      .update({ name: d.name, type: d.hostType as Enum<"host_type">, featured_rank: d.featuredRank, welcome_note: d.welcomeNote || null, ...place?.area })
       .eq("id", hostId),
     db.from("host_private").upsert({
       host_id: hostId,
@@ -60,6 +63,7 @@ export async function adminSaveHost(hostId: string, _prev: FormState, form: Form
       contact_email: d.contactEmail,
       contact_phone: d.contactPhone || null,
       commission_rate: d.commissionPercent,
+      ...place?.request,
     }),
   ]);
   if (a.error || b.error) {
@@ -140,7 +144,8 @@ export async function adminSaveOperator(operatorId: string, _prev: FormState, fo
   if (!uuid(operatorId)) return NOT_FOUND;
   const parsed = adminOperatorDetails.safeParse({
     name: form.get("name"),
-    areaId: form.get("areaId"),
+    areaId: form.get("areaId") ?? "",
+    town: form.get("town") ?? "",
     description: form.get("description") ?? "",
     website: form.get("website") ?? "",
     contactEmail: form.get("contactEmail"),
@@ -151,11 +156,12 @@ export async function adminSaveOperator(operatorId: string, _prev: FormState, fo
   const d = parsed.data;
 
   const { data: priv } = await db.from("operator_private").select("operator_id").eq("operator_id", operatorId).maybeSingle();
-  const contact = { contact_email: d.contactEmail, contact_phone: d.contactPhone || null };
+  const place = areaChoiceColumns(d.areaId, d.town);
+  const contact = { contact_email: d.contactEmail, contact_phone: d.contactPhone || null, ...place?.request };
   const [a, b] = await Promise.all([
     db
       .from("operators")
-      .update({ name: d.name, area_id: d.areaId, description: d.description || null, website: d.website || null, is_demo: d.isDemo })
+      .update({ name: d.name, description: d.description || null, website: d.website || null, is_demo: d.isDemo, ...place?.area })
       .eq("id", operatorId),
     priv
       ? db.from("operator_private").update(contact).eq("operator_id", operatorId)

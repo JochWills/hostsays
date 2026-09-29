@@ -11,7 +11,7 @@ The migrations in `supabase/migrations/` are the real schema. Where they differ 
 - **New columns:** `operators.is_demo` (seed placeholders), `hosts.featured_rank` and `experiences.featured_rank` (homepage features; null = not featured).
 - **Host-safe bookings** are a function, `host_bookings()`, not a view: it returns a host's referred bookings with guest first name only (no email, phone, notes or token).
 - **Extra view:** `host_cards` (verified hosts + pick count) for `/hosts`, area pages and the homepage.
-- **Areas are publicly readable**; `is_live` only controls what the site lists.
+- **Areas are publicly readable**; `is_live` only controls what the site lists, and the database keeps it up to date (see areas below).
 - **Operators never see the booking `token`** (column-level grant).
 - **Access:** the hosted project doesn't auto-expose tables, so every grant is explicit. Admin *reads* via RLS; admin *writes*, status changes and anything touching money go through server code with the service role.
 - **Integrity in the database:** reserved/clashing slugs, "only verified hosts recommend", "hosts can't recommend their own operator's experiences", and booking money must add up (`deposit + balance = total`, `commission + platform = deposit`).
@@ -62,16 +62,23 @@ create table provinces (                -- all 9 South African provinces, seeded
   intro text,
   sort_order int default 0
 );
-create table areas (                    -- towns, each in one province
+create table areas (                    -- places travellers pick: a town or well-known region, in one province
   id uuid primary key default gen_random_uuid(),
   province_id uuid not null references provinces,
-  slug text unique not null,            -- e.g. 'gqeberha', 'addo'
+  slug text unique not null,            -- e.g. 'gqeberha', 'sundays-river-valley'
   name text not null,
   intro text,                           -- SEO intro copy
   hero_image_path text,
   sort_order int default 0,
-  is_live boolean default false         -- only show when it has live listings
+  is_live boolean default false         -- automatic (triggers): a live experience from a verified operator, or a verified host
 );
+create table area_redirects (           -- old addresses of renamed or merged areas → 301 to the area
+  old_slug text primary key,
+  area_id uuid not null references areas on delete cascade
+);
+-- host_private / operator_private: requested_province_id, requested_town — "Somewhere else in <province>"
+-- at sign-up or in settings; an admin adds the town as an area (or picks one) in /admin/areas.
+-- merge_areas(from, into): moves experiences, hosts, operators and redirects, then deletes `from` (service role only).
 ```
 
 ### hosts

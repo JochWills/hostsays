@@ -100,6 +100,8 @@ export function StatusPill({ status }: { status: string }) {
     pending: ["Pending", "bg-gold/15 text-ink border border-gold/50"],
     verified: ["Verified", "bg-green/10 text-green"],
     suspended: ["Suspended", "bg-danger/10 text-danger"],
+    showing: ["On the site", "bg-green/10 text-green"],
+    hidden: ["Hidden: nothing live yet", "bg-panel text-muted"],
   };
   const [label, cls] = map[status] ?? [status, "bg-panel text-ink"];
   return <span className={`inline-block rounded-full px-2.5 py-0.5 text-[12.5px] font-semibold whitespace-nowrap ${cls}`}>{label}</span>;

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { CategoryChips } from "@/components/home/category-chips";
 import { pageTitle } from "@/components/ui/styles";
 import { categoryLabel, isCategory, CATEGORIES } from "@/lib/categories";
-import { getAreaBySlug, getExperiencesByArea } from "@/lib/data/public";
+import { getAreaBySlug, getAreaRedirect, getExperiencesByArea } from "@/lib/data/public";
 
 export const revalidate = 300;
 
@@ -14,7 +14,7 @@ export function generateStaticParams() {
   return [];
 }
 
-// Area + category landing pages, e.g. /addo/safari. Only for areas (host slugs 404 here).
+// Area + category landing pages, e.g. /gqeberha/ocean. Only for areas (host slugs 404 here).
 async function load(slug: string, category: string) {
   if (!isCategory(category)) return null;
   const area = await getAreaBySlug(slug);
@@ -37,7 +37,11 @@ export async function generateMetadata({ params }: PageProps<"/[slug]/[category]
 export default async function AreaCategoryPage({ params }: PageProps<"/[slug]/[category]">) {
   const { slug, category } = await params;
   const found = await load(slug, category);
-  if (!found) notFound();
+  if (!found) {
+    const moved = isCategory(category) ? await getAreaRedirect(slug) : null;
+    if (moved) permanentRedirect(`/${moved}/${category}`);
+    notFound();
+  }
   const { area } = found;
 
   const all = await getExperiencesByArea(area.id);

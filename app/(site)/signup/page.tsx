@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRight, BedDouble, Compass, MailCheck, UserRound } from "lucide-react";
 import { getCurrentUser, homeForRole } from "@/lib/auth";
-import { getAllAreas } from "@/lib/data/public";
+import { getAreaChoices } from "@/lib/data/public";
 import { firstValues } from "@/lib/validation/explore";
 import { ACCOUNT_TYPES, type AccountType } from "@/lib/validation/auth";
 import { pageTitle, panel } from "@/components/ui/styles";
@@ -96,7 +96,7 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
             </Link>
             <h1 className={`${pageTitle} mt-3`}>{TITLES[type]}</h1>
             <p className="mt-2 text-[15px] text-muted">{INTRO[type]}</p>
-            <SignupForm type={type} areas={type === "guest" ? [] : await getAllAreas()} />
+            <SignupForm type={type} provinces={type === "guest" ? [] : await getAreaChoices()} />
           </>
         ) : (
           <>

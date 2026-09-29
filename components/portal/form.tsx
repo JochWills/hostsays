@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useActionState, useContext, useEffect, useRef } from "react";
+import { createContext, useActionState, useContext, useEffect, useRef, useState } from "react";
 import type { FormAction, FormState } from "@/lib/form-state";
 import { btnPrimary, input, label as labelClass } from "@/components/ui/styles";
 import { Dropdown } from "@/components/ui/dropdown";
 import { DatePicker } from "@/components/ui/date-picker";
+import { areaOptions, isSomewhereElse, type AreaChoiceProvince } from "@/lib/area-options";
 
 const Ctx = createContext<FormState>({});
 
@@ -172,6 +173,50 @@ export function SelectField({
         describedBy={f.error ? `${p.name}-error` : undefined}
       />
     </Wrap>
+  );
+}
+
+/**
+ * "Which area?" with every province's areas and, per province, "Somewhere else in …" plus a town box.
+ * Someone still waiting for their town to be added starts on that option with their town filled in.
+ */
+export function AreaField({
+  provinces,
+  areaId,
+  requestedProvinceId,
+  requestedTown,
+  label = "Area",
+}: {
+  provinces: AreaChoiceProvince[];
+  areaId: string | null;
+  requestedProvinceId?: string | null;
+  requestedTown?: string | null;
+  label?: string;
+}) {
+  const state = useContext(Ctx);
+  const initial = areaId ?? (requestedProvinceId ? `other:${requestedProvinceId}` : "");
+  const [choice, setChoice] = useState(state.values?.areaId ?? initial);
+  const f = useField("areaId", initial);
+  return (
+    <>
+      <Wrap name="areaId" label={label} error={f.error} hint="Not listed? Choose “Somewhere else” under the province.">
+        <Dropdown
+          key={f.value}
+          id="areaId"
+          name="areaId"
+          labelledBy="areaId-label"
+          options={areaOptions(provinces, { somewhereElse: true })}
+          defaultValue={f.value}
+          onChange={setChoice}
+          placeholder="Choose the area"
+          invalid={Boolean(f.error)}
+          describedBy={f.error ? "areaId-error" : undefined}
+        />
+      </Wrap>
+      {isSomewhereElse(choice) && (
+        <TextField name="town" label="Town" defaultValue={requestedTown} hint="HostSays adds new towns when checking details." />
+      )}
+    </>
   );
 }
 

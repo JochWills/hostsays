@@ -35,7 +35,7 @@ export async function getOperatorSettings(operatorId: string) {
   const db = await createClient();
   const [{ data: op }, { data: priv }] = await Promise.all([
     db.from("operators").select("id, name, slug, area_id, description, website, status").eq("id", operatorId).single(),
-    db.from("operator_private").select("contact_email, contact_phone, terms_accepted_at").eq("operator_id", operatorId).single(),
+    db.from("operator_private").select("contact_email, contact_phone, terms_accepted_at, requested_province_id, requested_town").eq("operator_id", operatorId).single(),
   ]);
   if (!op || !priv) throw new Error("operator not found");
   return { ...op, ...priv };
@@ -103,7 +103,7 @@ export async function getHostSettings(hostId: string) {
   const db = await createClient();
   const [{ data: host }, { data: priv }, { data: bank }] = await Promise.all([
     db.from("hosts").select("id, name, slug, type, area_id, photo_path, welcome_note, status").eq("id", hostId).single(),
-    db.from("host_private").select("contact_email, contact_phone, listing_url, commission_rate").eq("host_id", hostId).single(),
+    db.from("host_private").select("contact_email, contact_phone, listing_url, commission_rate, requested_province_id, requested_town").eq("host_id", hostId).single(),
     db.from("host_bank_details").select("account_name, bank_name, account_number, branch_code, confirmed").eq("host_id", hostId).maybeSingle(),
   ]);
   if (!host || !priv) throw new Error("host not found");
@@ -189,12 +189,12 @@ export async function getPendingApplications(): Promise<{ hosts: PendingHost[]; 
   const [hosts, operators] = await Promise.all([
     db
       .from("hosts")
-      .select("id, name, type, created_at, areas(name), host_private(listing_url, contact_email, contact_phone), host_members(is_owner, profiles(full_name))")
+      .select("id, name, type, created_at, areas(name), host_private(listing_url, contact_email, contact_phone, requested_town, provinces(name)), host_members(is_owner, profiles(full_name))")
       .eq("status", "pending")
       .order("created_at"),
     db
       .from("operators")
-      .select("id, name, website, created_at, areas(name), operator_private(contact_email, contact_phone), operator_members(is_owner, profiles(full_name))")
+      .select("id, name, website, created_at, areas(name), operator_private(contact_email, contact_phone, requested_town, provinces(name)), operator_members(is_owner, profiles(full_name))")
       .eq("status", "pending")
       .eq("is_demo", false)
       .order("created_at"),
@@ -202,6 +202,8 @@ export async function getPendingApplications(): Promise<{ hosts: PendingHost[]; 
   if (hosts.error) throw new Error(`pending hosts: ${hosts.error.message}`);
   if (operators.error) throw new Error(`pending operators: ${operators.error.message}`);
 
+  const requested = (p: { requested_town: string | null; provinces: { name: string } | null } | null) =>
+    p?.requested_town ? `Asked for ${p.requested_town}${p.provinces ? `, ${p.provinces.name}` : ""} (add it under Areas)` : null;
   const owner = (members: { is_owner: boolean; profiles: { full_name: string | null } | null }[]) =>
     (members.find((m) => m.is_owner) ?? members[0])?.profiles?.full_name ?? null;
 
@@ -210,7 +212,7 @@ export async function getPendingApplications(): Promise<{ hosts: PendingHost[]; 
       id: h.id,
       name: h.name,
       type: h.type,
-      area: h.areas?.name ?? null,
+      area: h.areas?.name ?? requested(h.host_private),
       listingUrl: h.host_private?.listing_url ?? "",
       email: h.host_private?.contact_email ?? "",
       phone: h.host_private?.contact_phone ?? null,
@@ -220,7 +222,7 @@ export async function getPendingApplications(): Promise<{ hosts: PendingHost[]; 
     operators: operators.data.map((o) => ({
       id: o.id,
       name: o.name,
-      area: o.areas?.name ?? null,
+      area: o.areas?.name ?? requested(o.operator_private),
       website: o.website,
       email: o.operator_private?.contact_email ?? "",
       phone: o.operator_private?.contact_phone ?? null,
@@ -307,7 +309,7 @@ export async function getHostForAdmin(id: string) {
     db
       .from("hosts")
       .select(
-        "*, host_private(listing_url, contact_email, contact_phone, commission_rate), host_bank_details(account_name, bank_name, account_number, branch_code, confirmed, updated_at), host_members(user_id, is_owner, profiles(full_name, phone))",
+        "*, host_private(listing_url, contact_email, contact_phone, commission_rate, requested_province_id, requested_town), host_bank_details(account_name, bank_name, account_number, branch_code, confirmed, updated_at), host_members(user_id, is_owner, profiles(full_name, phone))",
       )
       .eq("id", id)
       .maybeSingle(),
@@ -329,7 +331,7 @@ export async function getOperatorForAdmin(id: string) {
   const { data, error } = await db
     .from("operators")
     .select(
-      "*, operator_private(contact_email, contact_phone, terms_accepted_at), operator_members(user_id, is_owner, profiles(full_name, phone)), experiences(id, title, status, price_cents, is_group_price, updated_at)",
+      "*, operator_private(contact_email, contact_phone, terms_accepted_at, requested_province_id, requested_town), operator_members(user_id, is_owner, profiles(full_name, phone)), experiences(id, title, status, price_cents, is_group_price, updated_at)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -354,4 +356,52 @@ export async function getMemberLogins(
       email: users[i].data.user?.email ?? null,
     }))
     .sort((a, b) => Number(b.isOwner) - Number(a.isOwner));
+}
+
+/** Provinces with every area and what's in it, plus hosts and operators waiting for their town. Admin only. */
+export async function getAreasForAdmin() {
+  const db = createAdminClient();
+  const [provinces, hostRequests, operatorRequests] = await Promise.all([
+    db
+      .from("provinces")
+      .select("id, slug, name, sort_order, areas(id, slug, name, intro, sort_order, is_live, experiences(id, status), hosts(id, status), operators(id), area_redirects(old_slug))")
+      .order("sort_order"),
+    db
+      .from("host_private")
+      .select("host_id, requested_town, provinces(id, name), hosts!inner(id, name, status, area_id)")
+      .not("requested_town", "is", null),
+    db
+      .from("operator_private")
+      .select("operator_id, requested_town, provinces(id, name), operators!inner(id, name, status, area_id)")
+      .not("requested_town", "is", null),
+  ]);
+  if (provinces.error) throw new Error(`areas: ${provinces.error.message}`);
+  if (hostRequests.error) throw new Error(`host requests: ${hostRequests.error.message}`);
+  if (operatorRequests.error) throw new Error(`operator requests: ${operatorRequests.error.message}`);
+
+  const requests = [
+    ...hostRequests.data.map((r) => ({ kind: "host" as const, id: r.hosts.id, name: r.hosts.name, status: r.hosts.status, town: r.requested_town!, province: r.provinces })),
+    ...operatorRequests.data.map((r) => ({ kind: "operator" as const, id: r.operators.id, name: r.operators.name, status: r.operators.status, town: r.requested_town!, province: r.provinces })),
+  ];
+  return {
+    provinces: provinces.data.map((p) => ({
+      ...p,
+      areas: [...p.areas]
+        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name))
+        .map((a) => ({
+          id: a.id,
+          slug: a.slug,
+          name: a.name,
+          intro: a.intro,
+          isLive: a.is_live,
+          liveExperiences: a.experiences.filter((e) => e.status === "live").length,
+          experiences: a.experiences.length,
+          verifiedHosts: a.hosts.filter((h) => h.status === "verified").length,
+          hosts: a.hosts.length,
+          operators: a.operators.length,
+          oldSlugs: a.area_redirects.map((r) => r.old_slug),
+        })),
+    })),
+    requests,
+  };
 }

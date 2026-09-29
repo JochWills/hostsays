@@ -134,6 +134,12 @@ export async function getProvinceBySlug(slug: string): Promise<Province | null> 
   return row ? { ...row, areas: row.areas.sort((a, b) => a.sort_order - b.sort_order) } : null;
 }
 
+/** All 9 provinces with every area (shown on the site or not), for "which area are you in?" dropdowns. */
+export async function getAreaChoices(): Promise<{ id: string; name: string; areas: { id: string; name: string }[] }[]> {
+  const provinces = await getProvinces({ allAreas: true });
+  return provinces.map((p) => ({ id: p.id, name: p.name, areas: p.areas.map((a) => ({ id: a.id, name: a.name })) }));
+}
+
 /** Every area (live or not) with its province, for forms: group options by `province`. */
 export async function getAllAreas(): Promise<{ id: string; name: string; province: string }[]> {
   const provinces = await getProvinces({ allAreas: true });
@@ -361,15 +367,30 @@ export type TopLevel =
   | { kind: "area"; area: Area }
   | { kind: "province"; province: Province }
   | { kind: "host"; host: HostCard }
+  | { kind: "redirect"; to: string }
   | null;
 
-/** Areas, then provinces, then verified hosts (docs/03-site-structure.md). Slugs never clash across them. */
+/** The current address of an area that used to live at `oldSlug` (renamed or merged), if any. */
+export async function getAreaRedirect(oldSlug: string): Promise<string | null> {
+  const db = createPublicClient();
+  const row = oneOrNull(
+    await db.from("area_redirects").select("areas(slug)").eq("old_slug", oldSlug).maybeSingle(),
+    "area redirect",
+  );
+  return row?.areas?.slug ?? null;
+}
+
+/**
+ * Areas, then provinces, then verified hosts (docs/03-site-structure.md). Slugs never clash across them.
+ * An old area address (renamed or merged) resolves to a redirect.
+ */
 export async function resolveTopLevelSlug(slug: string): Promise<TopLevel> {
   const [area, province] = await Promise.all([getAreaBySlug(slug), getProvinceBySlug(slug)]);
   if (area) return { kind: "area", area };
   if (province) return { kind: "province", province };
-  const host = await getHostBySlug(slug);
+  const [host, moved] = await Promise.all([getHostBySlug(slug), getAreaRedirect(slug)]);
   if (host) return { kind: "host", host };
+  if (moved) return { kind: "redirect", to: moved };
   return null;
 }
 

@@ -39,6 +39,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      area_redirects: {
+        Row: {
+          area_id: string
+          old_slug: string
+        }
+        Insert: {
+          area_id: string
+          old_slug: string
+        }
+        Update: {
+          area_id?: string
+          old_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "area_redirects_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "area_redirects_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "experience_cards"
+            referencedColumns: ["area_id"]
+          },
+          {
+            foreignKeyName: "area_redirects_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "host_cards"
+            referencedColumns: ["area_id"]
+          },
+          {
+            foreignKeyName: "area_redirects_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "host_storefront"
+            referencedColumns: ["area_id"]
+          },
+        ]
+      }
       areas: {
         Row: {
           hero_image_path: string | null
@@ -628,6 +672,8 @@ export type Database = {
           contact_phone: string | null
           host_id: string
           listing_url: string
+          requested_province_id: string | null
+          requested_town: string | null
           terms_accepted_at: string | null
         }
         Insert: {
@@ -636,6 +682,8 @@ export type Database = {
           contact_phone?: string | null
           host_id: string
           listing_url: string
+          requested_province_id?: string | null
+          requested_town?: string | null
           terms_accepted_at?: string | null
         }
         Update: {
@@ -644,6 +692,8 @@ export type Database = {
           contact_phone?: string | null
           host_id?: string
           listing_url?: string
+          requested_province_id?: string | null
+          requested_town?: string | null
           terms_accepted_at?: string | null
         }
         Relationships: [
@@ -666,6 +716,13 @@ export type Database = {
             columns: ["host_id"]
             isOneToOne: true
             referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "host_private_requested_province_id_fkey"
+            columns: ["requested_province_id"]
+            isOneToOne: false
+            referencedRelation: "provinces"
             referencedColumns: ["id"]
           },
         ]
@@ -871,6 +928,8 @@ export type Database = {
           contact_phone: string | null
           created_by_admin: boolean
           operator_id: string
+          requested_province_id: string | null
+          requested_town: string | null
           terms_accepted_at: string | null
         }
         Insert: {
@@ -879,6 +938,8 @@ export type Database = {
           contact_phone?: string | null
           created_by_admin?: boolean
           operator_id: string
+          requested_province_id?: string | null
+          requested_town?: string | null
           terms_accepted_at?: string | null
         }
         Update: {
@@ -887,6 +948,8 @@ export type Database = {
           contact_phone?: string | null
           created_by_admin?: boolean
           operator_id?: string
+          requested_province_id?: string | null
+          requested_town?: string | null
           terms_accepted_at?: string | null
         }
         Relationships: [
@@ -909,6 +972,13 @@ export type Database = {
             columns: ["operator_id"]
             isOneToOne: true
             referencedRelation: "operators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operator_private_requested_province_id_fkey"
+            columns: ["requested_province_id"]
+            isOneToOne: false
+            referencedRelation: "provinces"
             referencedColumns: ["id"]
           },
         ]
@@ -1466,6 +1536,10 @@ export type Database = {
           start_time: string
           status: Database["public"]["Enums"]["booking_status"]
         }[]
+      }
+      merge_areas: {
+        Args: { p_from: string; p_into: string }
+        Returns: undefined
       }
       record_storefront_visit: {
         Args: { p_host_id: string }

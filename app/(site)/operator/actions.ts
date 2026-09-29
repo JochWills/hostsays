@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formValues, invalid, type FormState } from "@/lib/form-state";
 import * as edit from "@/lib/experience-edit";
 import { operatorDetails } from "@/lib/validation/portal";
+import { areaChoiceColumns } from "@/lib/area-choice";
 
 const SAVE_FAILED = edit.SAVE_FAILED;
 
@@ -35,7 +36,8 @@ export async function saveOperatorDetails(_prev: FormState, form: FormData): Pro
   const { operator } = await requireOperator();
   const parsed = operatorDetails.safeParse({
     name: form.get("name"),
-    areaId: form.get("areaId"),
+    areaId: form.get("areaId") ?? "",
+    town: form.get("town") ?? "",
     description: form.get("description"),
     website: form.get("website"),
     contactEmail: form.get("contactEmail"),
@@ -43,16 +45,17 @@ export async function saveOperatorDetails(_prev: FormState, form: FormData): Pro
   });
   if (!parsed.success) return invalid(parsed.error, form);
   const d = parsed.data;
+  const place = areaChoiceColumns(d.areaId, d.town);
 
   const db = await createClient();
   const [a, b] = await Promise.all([
     db
       .from("operators")
-      .update({ name: d.name, area_id: d.areaId, description: d.description || null, website: d.website || null })
+      .update({ name: d.name, description: d.description || null, website: d.website || null, ...place?.area })
       .eq("id", operator.id),
     db
       .from("operator_private")
-      .update({ contact_email: d.contactEmail, contact_phone: d.contactPhone || null })
+      .update({ contact_email: d.contactEmail, contact_phone: d.contactPhone || null, ...place?.request })
       .eq("operator_id", operator.id),
   ]);
   if (a.error || b.error) return SAVE_FAILED;

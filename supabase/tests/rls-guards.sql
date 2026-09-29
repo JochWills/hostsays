@@ -12,7 +12,7 @@ insert into public.host_members values ('5eed0000-0000-4000-8000-d00000000003','
 do $$ begin
   begin insert into public.hosts (slug,name,type) values ('explore','X','bnb'); insert into results values ('reserved slug','ACCEPTED (bad)');
   exception when others then insert into results values ('reserved slug', 'rejected: '||sqlerrm); end;
-  begin insert into public.hosts (slug,name,type) values ('addo','X','bnb'); insert into results values ('host slug = area','ACCEPTED (bad)');
+  begin insert into public.hosts (slug,name,type) values ('gqeberha','X','bnb'); insert into results values ('host slug = area','ACCEPTED (bad)');
   exception when others then insert into results values ('host slug = area', 'rejected: '||sqlerrm); end;
   begin delete from public.recommendations where host_id='5eed0000-0000-4000-8000-d00000000003' and experience_id='5eed0000-0000-4000-8000-c00000000002';
         insert into public.recommendations (host_id, experience_id, tip) values ('5eed0000-0000-4000-8000-d00000000003','5eed0000-0000-4000-8000-c00000000002','mine');
