@@ -78,7 +78,7 @@ export function HeaderAccount({ overlay }: { overlay: boolean }) {
           Sign in
         </Link>
         <Link
-          href="/for-operators"
+          href="/signup?as=operator"
           className={`hidden items-center gap-2.5 rounded-[14px] px-[26px] py-[13px] font-semibold whitespace-nowrap hover:brightness-110 sm:inline-flex ${
             overlay ? "border border-white/10 bg-[#2D4A3E] text-white" : "border border-transparent bg-green text-green-ink"
           }`}
@@ -153,7 +153,7 @@ export function MobileAccountLinks({ onNavigate }: { onNavigate: () => void }) {
           Sign in
         </Link>
         <Link
-          href="/for-operators"
+          href="/signup?as=operator"
           onClick={onNavigate}
           className="mt-2 rounded-[14px] bg-green px-[26px] py-[13px] text-center font-semibold text-green-ink"
         >

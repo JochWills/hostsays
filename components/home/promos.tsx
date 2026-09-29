@@ -53,7 +53,7 @@ export function OperatorPromo() {
         List your experience for free. No monthly fees: you only pay {formatPercent(DEPOSIT_RATE)} on completed bookings,
         and we collect it for you.
       </p>
-      <Link href="/for-operators" className={promoBtn}>
+      <Link href="/signup?as=operator" className={promoBtn}>
         List your experience <ArrowRight size={16} strokeWidth={1.8} aria-hidden="true" />
       </Link>
     </section>
