@@ -80,7 +80,7 @@ export default async function Home() {
           <aside className="relative flex flex-col gap-[22px] md:flex-row lg:flex-col">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute top-0 -right-(--gutter) -bottom-10 hidden w-[170px] bg-[url(/images/coast.jpg)] bg-cover bg-center opacity-95 [mask-image:linear-gradient(90deg,transparent,#000_45%)] lg:block"
+              className="pointer-events-none absolute top-0 -right-(--gutter) bottom-0 hidden w-[170px] bg-[url(/images/coast.jpg)] bg-cover bg-center opacity-95 [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent,#000_45%),linear-gradient(180deg,#000_70%,transparent)] lg:block"
             />
             <HostPromo />
             <OperatorPromo />
