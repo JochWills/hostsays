@@ -16,7 +16,7 @@ export function Header({ variant = "solid" }: Props) {
 
   const inner = (
     <div className="flex items-center gap-3.5 pt-[22px] sm:gap-7 md:pt-[22px]">
-      <Logo onPhoto={overlay} />
+      <Logo />
       <nav
         aria-label="Main"
         className="ml-11 hidden gap-[26px] text-[14.5px] font-medium lg:flex min-[1360px]:gap-[30px]"
