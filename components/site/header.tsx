@@ -19,7 +19,7 @@ export function Header({ variant = "solid" }: Props) {
       <Logo />
       <nav
         aria-label="Main"
-        className="ml-11 hidden gap-[26px] text-[14.5px] font-medium lg:flex min-[1360px]:gap-[30px]"
+        className={`ml-11 hidden gap-[26px] text-[14.5px] font-medium lg:flex min-[1360px]:gap-[30px] ${overlay ? "text-ink" : ""}`}
       >
         {MAIN_NAV.map((l) => (
           <Link key={l.href} href={l.href} className="whitespace-nowrap opacity-95 hover:underline hover:underline-offset-[6px] hover:opacity-100">
