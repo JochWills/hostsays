@@ -28,15 +28,16 @@ export function PortalShell({
   const s = status ? STATUS[status] : null;
   return (
     <div className="wrap pt-6 pb-16 sm:pt-8">
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
-        <div className="min-w-0">
-          <p className="text-[12.5px] font-semibold tracking-[0.08em] text-muted uppercase">{eyebrow}</p>
-          <p className="mt-0.5 truncate text-[20px] font-extrabold tracking-[-0.02em] sm:text-[22px]">{title}</p>
-        </div>
-        {s && <span className={`mb-0.5 rounded-full px-3 py-1 text-[12.5px] font-semibold ${s.className}`}>{s.label}</span>}
-      </div>
-      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[210px_minmax(0,1fr)] md:gap-10">
+      {/* Who you are sits at the top of the side column, so it lines up with the page title. */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[210px_minmax(0,1fr)] md:gap-10">
         <aside className="min-w-0 md:sticky md:top-6 md:self-start">
+          <div className="mb-5 flex flex-wrap items-end gap-x-4 gap-y-2">
+            <div className="min-w-0">
+              <p className="text-[12.5px] font-semibold tracking-[0.08em] text-muted uppercase">{eyebrow}</p>
+              <p className="mt-0.5 truncate text-[20px] font-extrabold tracking-[-0.02em] sm:text-[22px]">{title}</p>
+            </div>
+            {s && <span className={`mb-0.5 rounded-full px-3 py-1 text-[12.5px] font-semibold ${s.className}`}>{s.label}</span>}
+          </div>
           <PortalNav items={PORTAL_NAV[role]} badges={badges} />
         </aside>
         <div className="min-w-0">{children}</div>
