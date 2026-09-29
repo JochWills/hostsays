@@ -4,6 +4,7 @@ import { Footer } from "@/components/site/footer";
 import { HeroSearch } from "@/components/home/hero-search";
 import { CategoryChips } from "@/components/home/category-chips";
 import { HostPromo, OperatorPromo } from "@/components/home/promos";
+import { PromoSlot } from "@/components/home/promo-slot";
 import { HowSteps } from "@/components/home/how-steps";
 import { ExperienceGrid } from "@/components/cards/experience-card";
 import { HostGrid } from "@/components/cards/host-card";
@@ -82,8 +83,10 @@ export default async function Home() {
               aria-hidden="true"
               className="pointer-events-none absolute top-0 -right-(--gutter) bottom-0 hidden w-[170px] bg-[url(/images/coast.jpg)] bg-cover bg-center opacity-95 [mask-composite:intersect] [mask-image:linear-gradient(90deg,transparent,#000_45%),linear-gradient(180deg,#000_70%,transparent)] lg:block"
             />
-            <HostPromo />
-            <OperatorPromo />
+            <PromoSlot>
+              <HostPromo />
+              <OperatorPromo />
+            </PromoSlot>
           </aside>
         </div>
 
