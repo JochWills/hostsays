@@ -47,8 +47,8 @@ export default async function Home() {
               <em className="font-serif font-semibold tracking-[-0.01em]">recommended by local hosts.</em>
             </h1>
             <p className="mt-[18px] max-w-[560px] text-[clamp(15px,1.35vw,18.5px)] leading-[1.45] opacity-95">
-              Book the best safaris, ocean trips and local adventures on the Eastern Cape coast, picked by the
-              guesthouses and hosts you stay with.
+              Book the best safaris, ocean trips and local adventures, picked by the guesthouses and hosts you
+              stay with.
             </p>
           </div>
           <HeroSearch places={places} minDate={minBookableDate()} />
@@ -91,7 +91,7 @@ export default async function Home() {
 
         {areas.length > 0 && (
           <p id="areas" className="mx-0.5 mt-[18px] text-[13px] text-muted">
-            Now live along the Eastern Cape coast:{" "}
+            Popular places:{" "}
             {areas.map((a, i) => (
               <span key={a.slug}>
                 <Link href={`/${a.slug}`} className="hover:text-green hover:underline">
@@ -100,6 +100,10 @@ export default async function Home() {
                 {i < areas.length - 2 ? ", " : i === areas.length - 2 ? " and " : ""}
               </span>
             ))}
+            .{" "}
+            <Link href="/areas" className="font-semibold text-green hover:underline">
+              See all areas
+            </Link>
             . Hosts earn a commission when you book through them.
           </p>
         )}

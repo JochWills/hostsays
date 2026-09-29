@@ -4,7 +4,7 @@ import { ProsePage } from "@/components/site/prose-page";
 
 export const metadata: Metadata = {
   title: "About HostSays",
-  description: "Things to do on the Eastern Cape coast, recommended by the local hosts who know the area best.",
+  description: "Things to do, recommended by the local hosts who know the area best.",
   alternates: { canonical: "/about" },
 };
 
@@ -19,8 +19,8 @@ export default function AboutPage() {
       intro="HostSays is where travellers find and book experiences that local hosts actually recommend."
     >
       <p>
-        Hosts along the Eastern Cape coast recommend things to do every day. Which game drive is worth it, when the bay
-        is calm enough for the seals, where to watch the sun go down. HostSays puts those recommendations in one place and
+        Hosts recommend things to do every day. Which game drive is worth it, when the sea is calm enough to snorkel,
+        where to watch the sun go down. HostSays puts those recommendations in one place and
         makes them easy to book.
       </p>
       <h2>How we&rsquo;re different</h2>
@@ -40,8 +40,8 @@ export default function AboutPage() {
       </p>
       <h2>Where we are</h2>
       <p>
-        We&rsquo;re starting on the Eastern Cape coast and growing as more hosts and operators join.{" "}
-        <Link href="/areas">See the areas we cover</Link>.
+        We&rsquo;re launching in South Africa and adding new places as local hosts and operators join, with more
+        countries to follow. <Link href="/areas">See the areas we cover</Link>.
       </p>
     </ProsePage>
   );

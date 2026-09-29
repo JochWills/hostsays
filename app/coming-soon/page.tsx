@@ -5,7 +5,7 @@ import { CATEGORIES } from "@/lib/categories";
 
 export const metadata: Metadata = {
   title: { absolute: "HostSays | Coming soon" },
-  description: "Things to do on the Eastern Cape coast, recommended by local hosts. Coming soon.",
+  description: "Things to do, recommended by local hosts. Launching in South Africa first. Coming soon.",
   robots: { index: false, follow: false },
 };
 
@@ -32,8 +32,8 @@ export default function ComingSoon() {
             <em className="font-serif font-semibold tracking-[-0.01em]">recommended by local hosts.</em>
           </h1>
           <p className="mt-[18px] max-w-[560px] text-[clamp(15px,1.35vw,18.5px)] leading-[1.45] opacity-95 [text-shadow:0_1px_12px_rgba(0,0,0,.3)]">
-            Safaris, ocean trips and local adventures on the Eastern Cape coast, picked by the guesthouses and hosts
-            you stay with. We&rsquo;re getting ready to open.
+            Safaris, ocean trips and local adventures, picked by the guesthouses and hosts you stay with. We&rsquo;re
+            launching in South Africa first, with more of the world to follow.
           </p>
 
           <ul aria-label="What you'll find" className="mt-9 flex flex-wrap gap-x-[18px] gap-y-3">

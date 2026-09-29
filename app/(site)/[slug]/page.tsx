@@ -105,8 +105,8 @@ async function ProvincePage({ province }: { province: Province }) {
         <section className="mt-8 max-w-[640px] rounded-[14px] bg-surface p-6 shadow-card">
           <h2 className="text-[20px] font-bold">Coming soon to {provinceInSentence(province.name)}</h2>
           <p className="mt-2 text-muted">
-            We&rsquo;re starting on the Eastern Cape coast. Run a guesthouse or a tour here? Join now and be among the first
-            listed.
+            We&rsquo;re adding places as local hosts and operators join. Run a guesthouse or a tour here? Join now and be
+            among the first listed.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5">
             <Link href="/signup?as=host" className={btnSecondary}>

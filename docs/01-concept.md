@@ -25,7 +25,8 @@ A marketplace with three sides:
 - **Hosts are the distribution channel.** Guests arrive through a host's link or QR code, so we don't depend on Google traffic at launch.
 
 ## Launch
-- **Region:** the whole Eastern Cape coast (e.g. Gqeberha, Addo, Jeffreys Bay, St Francis Bay, Kenton-on-Sea, Port Alfred, and further along the coast as supply allows).
+- **Region:** onboarding starts with Eastern Cape hosts and operators, then the rest of South Africa; other countries later.
+- **Positioning:** the site must never read as limited to one area. Copy talks about South Africa as the current focus ("launching in South Africa first") and never about "the Eastern Cape coast". Towns only appear as examples or "popular places", never as the whole offer.
 - **No fixed launch date and no minimum sign-ups.** Soft launch through hosts first; only show areas and categories that have live listings.
 - **Aim:** be live before the December peak season if possible.
 

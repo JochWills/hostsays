@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s · HostSays",
   },
   description:
-    "Discover and book tours, safaris and ocean experiences on the Eastern Cape coast, recommended by the hosts you stay with.",
+    "Discover and book safaris, tours and local experiences, recommended by the guesthouses and hosts you stay with.",
   openGraph: {
     siteName: "HostSays",
     locale: "en_ZA",

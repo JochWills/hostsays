@@ -9,7 +9,7 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Where to go in South Africa",
-  description: "Browse things to do by province and town, recommended by local hosts. Starting on the Eastern Cape coast.",
+  description: "Browse things to do by province and town, recommended by local hosts.",
   alternates: { canonical: "/areas" },
 };
 
@@ -20,7 +20,7 @@ export default async function AreasPage() {
     <div className="wrap pt-8">
       <h1 className={pageTitle}>Where to go</h1>
       <p className="mt-2 max-w-[640px] text-muted">
-        Pick a province, then a town. We&rsquo;re starting on the Eastern Cape coast, with more of South Africa on the way.
+        Pick a province, then a town. New places are added as local hosts and operators join.
       </p>
 
       <div className="mt-8 space-y-9">
